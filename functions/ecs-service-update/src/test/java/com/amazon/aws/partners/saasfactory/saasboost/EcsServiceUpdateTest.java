@@ -33,36 +33,37 @@ public class EcsServiceUpdateTest {
         Map<String, Object> actionConfiguration = new HashMap<>();
         Map<String, Object> configuration = new HashMap<>();
         configuration.put("FunctionName", "saas-boost-update-ecs-us-west-2");
-        configuration.put("UserParameters", "{\"cluster\":\"tenant-5ff91f82\",\"service\":\"arn:aws:ecs:us-west-2:914245659875:service/tenant-5ff91f82\",\"desiredCount\":1}");
+        configuration.put("UserParameters",
+                "{\"cluster\":\"tenant-5ff91f82\",\"service\":\"arn:aws-cn:ecs:us-west-2:914245659875:service/tenant-5ff91f82\",\"desiredCount\":1}");
         actionConfiguration.put("configuration", configuration);
         data.put("actionConfiguration", actionConfiguration);
 
-        String json = (String) ((Map) ((Map) data.get("actionConfiguration")).get("configuration")).get("UserParameters");
+        String json = (String) ((Map) ((Map) data.get("actionConfiguration")).get("configuration"))
+                .get("UserParameters");
         System.out.println(json);
-//        data.values()
-//                .stream()
-//                .filter(obj -> obj instanceof Map)
-//                .map(obj -> (Map) obj)
-//                .filter(obj -> obj.containsKey("actionConfiguration"))
-//                .filter(obj -> obj.containsKey("configuration"))
-//                .forEach(obj -> System.out.println(obj + " instance of " + obj.getClass()));
-//                .map(obj -> ((Map) obj).entrySet())
-//                .filter(map -> map.getKey().equals("actionConfiguration"))
-//                .map(Map.Entry::getValue)
-//                .flatMap(m -> ((Map.Entry) m).entrySet().stream())
-//                .stream()
-//                .filter(map -> map.getKey().equals("actionConfiguration"))
-//                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-//                .entrySet()
-//                .stream()
-//                .filter(map -> map.getKey().equals("configuration"))
-//                .forEach(System.out::println);
+        // data.values()
+        // .stream()
+        // .filter(obj -> obj instanceof Map)
+        // .map(obj -> (Map) obj)
+        // .filter(obj -> obj.containsKey("actionConfiguration"))
+        // .filter(obj -> obj.containsKey("configuration"))
+        // .forEach(obj -> System.out.println(obj + " instance of " + obj.getClass()));
+        // .map(obj -> ((Map) obj).entrySet())
+        // .filter(map -> map.getKey().equals("actionConfiguration"))
+        // .map(Map.Entry::getValue)
+        // .flatMap(m -> ((Map.Entry) m).entrySet().stream())
+        // .stream()
+        // .filter(map -> map.getKey().equals("actionConfiguration"))
+        // .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        // .entrySet()
+        // .stream()
+        // .filter(map -> map.getKey().equals("configuration"))
+        // .forEach(System.out::println);
 
-
-//        for (Map.Entry<String, Object> value : data.entrySet()) {
-//
-//        }
-//        data.get("actionConfiguration").get("configuration").get("UserParameters");
+        // for (Map.Entry<String, Object> value : data.entrySet()) {
+        //
+        // }
+        // data.get("actionConfiguration").get("configuration").get("UserParameters");
     }
 
 }

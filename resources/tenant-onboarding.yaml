@@ -471,14 +471,14 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:DescribeLogGroups
                   - logs:DescribeLogStreams
                   - logs:CreateLogStream
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - autoscaling:DescribeAutoScalingInstances
@@ -491,7 +491,7 @@ Resources:
                 Resource:
                   Fn::Join:
                     - ""
-                    - - "arn:aws:autoscaling:*:"
+                    - - "arn:aws-cn:autoscaling:*:"
                       - !Ref "AWS::AccountId"
                       - ":autoScalingGroup:*:autoScalingGroupName/tenant-"
                       - !Select [0, !Split ['-', !Ref TenantId]]
@@ -560,19 +560,19 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - ecr:BatchCheckLayerAvailability
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
                 Resource:
-                  - !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ContainerRepository}
+                  - !Sub arn:aws-cn:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ContainerRepository}
               - Effect: Allow
                 Action:
                   - ecr:GetAuthorizationToken
@@ -581,17 +581,17 @@ Resources:
                 Action:
                   - ssm:GetParameters
                 Resource:
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_USERNAME
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_PASSWORD
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_PORT
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_HOST
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_NAME
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/METRICS_STREAM
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_USERNAME
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_PASSWORD
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_PORT
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_HOST
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_NAME
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/METRICS_STREAM
               - Effect: Allow
                 Action:
                   - fsx:DescribeFileSystems
                 Resource:
-                  - !Sub arn:aws:fsx:${AWS::Region}:${AWS::AccountId}:file-system/*
+                  - !Sub arn:aws-cn:fsx:${AWS::Region}:${AWS::AccountId}:file-system/*
   ECSLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -624,19 +624,19 @@ Resources:
                   - firehose:PutRecord
                   - firehose:PutRecordBatch
                 Resource:
-                  - !Sub arn:aws:firehose:${AWS::Region}:${AWS::AccountId}:deliverystream/${MetricsStream}
+                  - !Sub arn:aws-cn:firehose:${AWS::Region}:${AWS::AccountId}:deliverystream/${MetricsStream}
               - Effect: Allow
                 Action:
                   - events:DescribeEventBus
                   - events:PutEvents
                 Resource:
-                  - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/${EventBus}
+                  - !Sub arn:aws-cn:events:${AWS::Region}:${AWS::AccountId}:event-bus/${EventBus}
               - Effect: Allow
                 Action:
                   - s3:GetObject
                   - s3:GetObjectVersion
                 Resource:
-                  - !Sub arn:aws:s3:::${SaaSBoostBucket}/tenants/${TenantId}/*
+                  - !Sub arn:aws-cn:s3:::${SaaSBoostBucket}/tenants/${TenantId}/*
               - Effect: Allow
                 Action:
                   - ssmmessages:CreateControlChannel
@@ -712,11 +712,11 @@ Resources:
             Fn::If:
               - ProvisionRDS
               - - Name: DB_MASTER_USERNAME
-                  ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_USERNAME
+                  ValueFrom: !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_USERNAME
                 - Name: DB_MASTER_PASSWORD
-                  ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_PASSWORD
+                  ValueFrom: !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_PASSWORD
                 - Name: DB_PORT
-                  ValueFrom: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_PORT
+                  ValueFrom: !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_PORT
               - !Ref 'AWS::NoValue'
       Volumes:
         !If
@@ -843,12 +843,12 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - ec2:DescribeTags
@@ -860,7 +860,7 @@ Resources:
                   - ecr:GetDownloadUrlForLayer
                   - ecr:BatchGetImage
                 Resource:
-                  - !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ContainerRepository}
+                  - !Sub arn:aws-cn:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ContainerRepository}
               - Effect: Allow
                 Action:
                   - ecr:GetAuthorizationToken
@@ -873,13 +873,13 @@ Resources:
                   - ecs:SubmitContainerStateChange
                   - ecs:SubmitTaskStateChange
                 Resource:
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${ECSCluster}
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${ECSCluster}
               - Effect: Allow
                 Action:
                   - ecs:Poll
                   - ecs:StartTelemetrySession
                 Resource:
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:container-instance/*
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:container-instance/*
                 Condition:
                   StringLike:
                     ecs:cluster:
@@ -894,11 +894,11 @@ Resources:
                   - ssm:GetParameter
                   - ssm:GetParameters
                 Resource:
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/ACTIVE_DIRECTORY_USER
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/ACTIVE_DIRECTORY_PASSWORD
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/ACTIVE_DIRECTORY_DNS_IPS
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/ACTIVE_DIRECTORY_DNS_NAME
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/tenant/${TenantId}/WINDOWS_FSX_DNS_NAME
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/ACTIVE_DIRECTORY_USER
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/ACTIVE_DIRECTORY_PASSWORD
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/ACTIVE_DIRECTORY_DNS_IPS
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/ACTIVE_DIRECTORY_DNS_NAME
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/tenant/${TenantId}/WINDOWS_FSX_DNS_NAME
               - Effect: Allow
                 Action:
                   - ds:CreateComputer
@@ -907,7 +907,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - kms:Decrypt
-                Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/alias/aws/ssm
+                Resource: !Sub arn:aws-cn:kms:${AWS::Region}:${AWS::AccountId}:key/alias/aws/ssm
   ECSInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Condition: WindowsOS
@@ -1205,7 +1205,7 @@ Resources:
       - ECSService
     Properties:
       ResourceId: !Sub service/${ECSCluster}/${ECSService.Name}
-      RoleARN: !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      RoleARN: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
       ServiceNamespace: ecs
       ScalableDimension: ecs:service:DesiredCount
       MaxCapacity: !Ref MaxTaskCount
@@ -1337,7 +1337,7 @@ Resources:
       - TenantVpcTgwAssociation
       - UpdateRouteTable
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/tenant-onboarding-fsx.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/tenant-onboarding-fsx.yaml
       Parameters:
         Environment: !Ref Environment
         TenantId: !Ref TenantId
@@ -1359,7 +1359,7 @@ Resources:
     Metadata:
       ForceUpdate: !Ref LambdaSourceFolder
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/tenant-onboarding-efs.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/tenant-onboarding-efs.yaml
       Parameters:
         TenantId: !Ref TenantId
         VPC: !Ref VPC
@@ -1391,7 +1391,7 @@ Resources:
       - TenantVpcTgwAssociation
       - UpdateRouteTable
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/tenant-onboarding-rds.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/tenant-onboarding-rds.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket

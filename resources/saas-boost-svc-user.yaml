@@ -27,9 +27,9 @@ Parameters:
   Environment:
     Description: Environment name
     Type: String
-  CognitoUserPoolId:
-    Description: User Pool Id
-    Type: String
+  # CognitoUserPoolId:
+  #   Description: User Pool Id
+  #   Type: String
 Resources:
   UserServiceExecutionRole:
     Type: AWS::IAM::Role
@@ -53,26 +53,26 @@ Resources:
               - Effect: Allow
                 Action:
                   - logs:PutLogEvents
-                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                Resource: !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
-              - Effect: Allow
-                Action:
-                  - cognito-idp:AdminCreateUser
-                  - cognito-idp:AdminGetUser
-                  - cognito-idp:AdminEnableUser
-                  - cognito-idp:AdminDisableUser
-                  - cognito-idp:AdminUpdateUserAttributes
-                  - cognito-idp:AdminDeleteUser
-                  - cognito-idp:ListUsers
-                  - cognito-idp:AdminInitiateAuth
-                  - cognito-idp:ListUserPoolClients
-                Resource:
-                  - !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+              # - Effect: Allow
+              #   Action:
+              #     - cognito-idp:AdminCreateUser
+              #     - cognito-idp:AdminGetUser
+              #     - cognito-idp:AdminEnableUser
+              #     - cognito-idp:AdminDisableUser
+              #     - cognito-idp:AdminUpdateUserAttributes
+              #     - cognito-idp:AdminDeleteUser
+              #     - cognito-idp:ListUsers
+              #     - cognito-idp:AdminInitiateAuth
+              #     - cognito-idp:ListUserPoolClients
+              #   Resource:
+              #     - !Sub arn:aws-cn:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPoolId}
   UserServiceGetByIdLogs:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -95,7 +95,7 @@ Resources:
       Environment:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
-          SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
+          # SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
       Tags:
         - Key: "Application"
           Value: "SaaSBoost"
@@ -125,7 +125,7 @@ Resources:
       Environment:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
-          SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
+          # SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
       Tags:
         - Key: "Application"
           Value: "SaaSBoost"
@@ -156,7 +156,7 @@ Resources:
       Environment:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
-          SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
+          # SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
       Tags:
         - Key: "Application"
           Value: "SaaSBoost"
@@ -187,7 +187,7 @@ Resources:
       Environment:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
-          SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
+          # SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
       Tags:
         - Key: "Application"
           Value: "SaaSBoost"
@@ -218,7 +218,7 @@ Resources:
       Environment:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
-          SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
+          # SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
       Tags:
         - Key: "Application"
           Value: "SaaSBoost"
@@ -249,7 +249,7 @@ Resources:
       Environment:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
-          SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
+          # SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
       Tags:
         - Key: "Application"
           Value: "SaaSBoost"
@@ -280,7 +280,7 @@ Resources:
       Environment:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
-          SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
+          # SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
       Tags:
         - Key: "Application"
           Value: "SaaSBoost"
@@ -311,7 +311,7 @@ Resources:
       Environment:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
-          SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
+          # SAAS_BOOST_USERPOOL_ID: !Ref CognitoUserPoolId
       Tags:
         - Key: "Application"
           Value: "SaaSBoost"

@@ -139,7 +139,7 @@ Resources:
           - Effect: Allow
             Principal:
               AWS:
-                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+                - !Sub "arn:aws-cn:iam::${AWS::AccountId}:root"
             Action: 'kms:*'
             Resource: '*'
           - Effect: Allow
@@ -164,7 +164,7 @@ Resources:
           #     AWS:
           #       - !Join
           #         - ''
-          #         - - 'arn:aws:iam::'
+          #         - - 'arn:aws-cn:iam::'
           #           - !Ref 'AWS::AccountId'
           #           - :root
           #   Action:
@@ -187,7 +187,7 @@ Resources:
           #     AWS:
           #       - !Join
           #         - ''
-          #         - - 'arn:aws:iam::'
+          #         - - 'arn:aws-cn:iam::'
           #           - !Ref 'AWS::AccountId'
           #           - :root
           #   Action:
@@ -203,7 +203,7 @@ Resources:
           #     AWS:
           #       - !Join
           #         - ''
-          #         - - 'arn:aws:iam::'
+          #         - - 'arn:aws-cn:iam::'
           #           - !Ref 'AWS::AccountId'
           #           - :root
           #   Action:
@@ -359,14 +359,14 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:DescribeLogGroups
                   - logs:DescribeLogStreams
                   - logs:CreateLogStream
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - ec2:CreateNetworkInterface
@@ -377,16 +377,16 @@ Resources:
                 Action:
                   - s3:GetObject
                 Resource:
-                  - !Sub arn:aws:s3:::${SaaSBoostBucket}/bootstrap.sql
+                  - !Sub arn:aws-cn:s3:::${SaaSBoostBucket}/bootstrap.sql
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
                 Resource:
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_PASSWORD
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/DB_MASTER_PASSWORD
               - Effect: Allow
                 Action:
                   - kms:Decrypt
-                Resource: !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/*
+                Resource: !Sub arn:aws-cn:kms:${AWS::Region}:${AWS::AccountId}:key/*
                 Condition:
                   StringEquals:
                     kms:ViaService:

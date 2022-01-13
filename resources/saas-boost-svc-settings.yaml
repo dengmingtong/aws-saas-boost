@@ -83,14 +83,14 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:DescribeLogGroups
                   - logs:DescribeLogStreams
                   - logs:CreateLogStream
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - dynamodb:DescribeTable
@@ -98,7 +98,7 @@ Resources:
                   - dynamodb:Scan
                   - dynamodb:UpdateItem
                 Resource:
-                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${RdsOptionsTable}
+                  - !Sub arn:aws-cn:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${RdsOptionsTable}
               - Effect: Allow
                 Action:
                   - rds:DescribeOrderableDBInstanceOptions
@@ -109,6 +109,8 @@ Resources:
     Properties:
       LogGroupName: !Sub /aws/lambda/sb-${Environment}-rds-options
       RetentionInDays: 30
+    # UpdateReplacePolicy: Retain
+    # DeletionPolicy: Retain
   RdsOptions:
     Type: AWS::Lambda::Function
     Properties:
@@ -157,13 +159,13 @@ Resources:
               - Effect: Allow
                 Action:
                   - logs:PutLogEvents
-                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                Resource: !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
@@ -173,7 +175,7 @@ Resources:
                   - ssm:DeleteParameter
                   - ssm:DeleteParameters
                 Resource:
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*
               - Effect: Allow
                 Action:
                   - dynamodb:DescribeTable
@@ -181,27 +183,27 @@ Resources:
                   - dynamodb:Scan
                   - dynamodb:Query
                 Resource:
-                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${RdsOptionsTable}
+                  - !Sub arn:aws-cn:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${RdsOptionsTable}
               - Effect: Allow
                 Action:
                   - events:PutEvents
                 Resource:
-                  - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/${SaaSBoostEventBus}
+                  - !Sub arn:aws-cn:events:${AWS::Region}:${AWS::AccountId}:event-bus/${SaaSBoostEventBus}
               - Effect: Allow
                 Action:
                   - s3:GetBucketCORS
                   - s3:PutBucketCORS
                 Resource:
-                  - !Sub arn:aws:s3:::${SaaSBoostBucket}
+                  - !Sub arn:aws-cn:s3:::${SaaSBoostBucket}
               - Effect: Allow
                 Action:
                   - s3:PutObject
                 Resource:
-                  - !Sub arn:aws:s3:::${SaaSBoostBucket}/*
+                  - !Sub arn:aws-cn:s3:::${SaaSBoostBucket}/*
               - Effect: Allow
                 Action:
                   - sts:AssumeRole
-                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+                Resource: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
   SettingsServiceGetAllLogs:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -501,7 +503,7 @@ Resources:
         Variables:
           SAAS_BOOST_ENV: !Ref Environment
           SAAS_BOOST_EVENT_BUS: !Ref SaaSBoostEventBus
-          API_TRUST_ROLE: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+          API_TRUST_ROLE: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
           API_GATEWAY_HOST: !Sub ${SaaSBoostPrivateApi}.execute-api.${AWS::Region}.amazonaws.com
           API_GATEWAY_STAGE: !Ref PrivateApiStage
       Tags:

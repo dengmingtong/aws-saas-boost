@@ -52,7 +52,7 @@ Resources:
             ErrorCachingMinTTL: 300
         #Logging:
         #  IncludeCookies: 'false'
-        #  Bucket: mylogs.s3.amazonaws.com
+        #  Bucket: mylogs.s3.amazonaws.com.cn
         #  Prefix: myprefix
         DefaultCacheBehavior:
           AllowedMethods:
@@ -69,7 +69,7 @@ Resources:
             Cookies:
               Forward: none
           ViewerProtocolPolicy: allow-all
-        IPV6Enabled: true
+        IPV6Enabled: false
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
         # Restrictions:
@@ -78,102 +78,102 @@ Resources:
         #     #this is for testing to reduce distribution locations
         #     Locations:
         #       - US
-  ConsoleUserPool:
-    Type: AWS::Cognito::UserPool
-    DependsOn: ConsoleCloudFrontDistribution
-    Properties:
-      UserPoolName: !Sub sb-users-${Environment}
-      MfaConfiguration: "OFF"
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          RequireLowercase: true
-          RequireNumbers: true
-          RequireSymbols: false
-          RequireUppercase: true
-          TemporaryPasswordValidityDays: 7
-      AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: true
-        InviteMessageTemplate:
-          EmailMessage: !Sub |
-            <b>Welcome to AWS SaaS Boost!</b> <br>
-            <br>
-            You can login to your AWS SaaS Boost environment at <a rel="noopener noreferrer" href="https://${ConsoleCloudFrontDistribution.DomainName}">https://${ConsoleCloudFrontDistribution.DomainName}</a>.
-            <br>
-            Your username is:  <b>{username}</b>
-            <br>
-            Your temporary password is:  <b>{####}</b>
-            <br>
-          EmailSubject: !Sub AWS SaaS Boost temporary password for environment ${Environment}
-      Schema:
-        - Name: tenant_id
-          AttributeDataType: String
-          Mutable: false
-        - Name: identity_pool
-          AttributeDataType: String
-          Mutable: false
-  ConsoleUserPoolClient:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      ClientName: !Sub sb-client-app-${Environment}
-      UserPoolId: !Ref ConsoleUserPool
-      SupportedIdentityProviders:
-        - COGNITO
-      ExplicitAuthFlows:
-        - ALLOW_ADMIN_USER_PASSWORD_AUTH
-        - ALLOW_USER_PASSWORD_AUTH
-        - ALLOW_REFRESH_TOKEN_AUTH
-        - ALLOW_USER_SRP_AUTH
-      GenerateSecret: false
-  ConsoleIdentityPool:
-    Type: AWS::Cognito::IdentityPool
-    Properties:
-      IdentityPoolName: !Sub sb-identities-${Environment}
-      AllowClassicFlow: true
-      AllowUnauthenticatedIdentities: false
-      CognitoIdentityProviders:
-        - ClientId: !Ref ConsoleUserPoolClient
-          ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${ConsoleUserPool}
-          ServerSideTokenCheck: true
-  ConsoleIdentityPoolAuthRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub sb-cognito-auth-role-${Environment}-${AWS::Region}
-      Path: '/'
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal: {"Federated": "cognito-identity.amazonaws.com"}
-            Action:
-              - sts:AssumeRoleWithWebIdentity
-            Condition:
-              StringEquals:
-                cognito-identity.amazonaws.com:aud:
-                  - !Ref ConsoleIdentityPool
-              ForAnyValue:StringLike: {"cognito-identity.amazonaws.com:amr": authenticated}
-  ConsoleIdentityPoolRoleAttachment:
-    Type: AWS::Cognito::IdentityPoolRoleAttachment
-    Properties:
-      IdentityPoolId: !Ref ConsoleIdentityPool
-      Roles:
-        authenticated: !GetAtt ConsoleIdentityPoolAuthRole.Arn
-  # Create the initial admin user
-  ConsoleAdminUser:
-    Type: AWS::Cognito::UserPoolUser
-    Properties:
-      DesiredDeliveryMediums:
-        - EMAIL
-      ForceAliasCreation: false
-      UserAttributes:
-        - Name: "custom:identity_pool"
-          Value: !Ref ConsoleIdentityPool
-        - Name: "email"
-          Value: !Ref AdminEmailAddress
-        - Name: "email_verified"
-          Value: "true"
-      Username: admin
-      UserPoolId: !Ref ConsoleUserPool
+  # ConsoleUserPool:
+  #   Type: AWS::Cognito::UserPool
+  #   DependsOn: ConsoleCloudFrontDistribution
+  #   Properties:
+  #     UserPoolName: !Sub sb-users-${Environment}
+  #     MfaConfiguration: "OFF"
+  #     Policies:
+  #       PasswordPolicy:
+  #         MinimumLength: 8
+  #         RequireLowercase: true
+  #         RequireNumbers: true
+  #         RequireSymbols: false
+  #         RequireUppercase: true
+  #         TemporaryPasswordValidityDays: 7
+  #     AdminCreateUserConfig:
+  #       AllowAdminCreateUserOnly: true
+  #       InviteMessageTemplate:
+  #         EmailMessage: !Sub |
+  #           <b>Welcome to AWS SaaS Boost!</b> <br>
+  #           <br>
+  #           You can login to your AWS SaaS Boost environment at <a rel="noopener noreferrer" href="https://${ConsoleCloudFrontDistribution.DomainName}">https://${ConsoleCloudFrontDistribution.DomainName}</a>.
+  #           <br>
+  #           Your username is:  <b>{username}</b>
+  #           <br>
+  #           Your temporary password is:  <b>{####}</b>
+  #           <br>
+  #         EmailSubject: !Sub AWS SaaS Boost temporary password for environment ${Environment}
+  #     Schema:
+  #       - Name: tenant_id
+  #         AttributeDataType: String
+  #         Mutable: false
+  #       - Name: identity_pool
+  #         AttributeDataType: String
+  #         Mutable: false
+  # ConsoleUserPoolClient:
+  #   Type: AWS::Cognito::UserPoolClient
+  #   Properties:
+  #     ClientName: !Sub sb-client-app-${Environment}
+  #     UserPoolId: !Ref ConsoleUserPool
+  #     SupportedIdentityProviders:
+  #       - COGNITO
+  #     ExplicitAuthFlows:
+  #       - ALLOW_ADMIN_USER_PASSWORD_AUTH
+  #       - ALLOW_USER_PASSWORD_AUTH
+  #       - ALLOW_REFRESH_TOKEN_AUTH
+  #       - ALLOW_USER_SRP_AUTH
+  #     GenerateSecret: false
+  # ConsoleIdentityPool:
+  #   Type: AWS::Cognito::IdentityPool
+  #   Properties:
+  #     IdentityPoolName: !Sub sb-identities-${Environment}
+  #     AllowClassicFlow: true
+  #     AllowUnauthenticatedIdentities: false
+  #     CognitoIdentityProviders:
+  #       - ClientId: !Ref ConsoleUserPoolClient
+  #         ProviderName: !Sub cognito-idp.${AWS::Region}.amazonaws.com/${ConsoleUserPool}
+  #         ServerSideTokenCheck: true
+  # ConsoleIdentityPoolAuthRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     RoleName: !Sub sb-cognito-auth-role-${Environment}-${AWS::Region}
+  #     Path: '/'
+  #     AssumeRolePolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal: {"Federated": "cognito-identity.amazonaws.com"}
+  #           Action:
+  #             - sts:AssumeRoleWithWebIdentity
+  #           Condition:
+  #             StringEquals:
+  #               cognito-identity.amazonaws.com:aud:
+  #                 - !Ref ConsoleIdentityPool
+  #             ForAnyValue:StringLike: {"cognito-identity.amazonaws.com:amr": authenticated}
+  # ConsoleIdentityPoolRoleAttachment:
+  #   Type: AWS::Cognito::IdentityPoolRoleAttachment
+  #   Properties:
+  #     IdentityPoolId: !Ref ConsoleIdentityPool
+  #     Roles:
+  #       authenticated: !GetAtt ConsoleIdentityPoolAuthRole.Arn
+  # # Create the initial admin user
+  # ConsoleAdminUser:
+  #   Type: AWS::Cognito::UserPoolUser
+  #   Properties:
+  #     DesiredDeliveryMediums:
+  #       - EMAIL
+  #     ForceAliasCreation: false
+  #     UserAttributes:
+  #       - Name: "custom:identity_pool"
+  #         Value: !Ref ConsoleIdentityPool
+  #       - Name: "email"
+  #         Value: !Ref AdminEmailAddress
+  #       - Name: "email_verified"
+  #         Value: "true"
+  #     Username: admin
+  #     UserPoolId: !Ref ConsoleUserPool
   WebBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -187,31 +187,31 @@ Resources:
               CanonicalUser:
                 !GetAtt ConsoleOriginAccessIdentity.S3CanonicalUserId
             Action: s3:GetObject
-            Resource: !Sub arn:aws:s3:::${WebS3Bucket}/*
+            Resource: !Sub arn:aws-cn:s3:::${WebS3Bucket}/*
           - Effect: Deny
             Action: s3:*
             Principal: '*'
             Resource:
-              - !Sub arn:aws:s3:::${WebS3Bucket}/*
-              - !Sub arn:aws:s3:::${WebS3Bucket}
+              - !Sub arn:aws-cn:s3:::${WebS3Bucket}/*
+              - !Sub arn:aws-cn:s3:::${WebS3Bucket}
             Condition:
               Bool: {'aws:SecureTransport': false}
 Outputs:
-  SBUserPool:
-    Description: SaaS Boost User Pool Id
-    Value: !Ref ConsoleUserPool
-    Export:
-      Name: !Sub saas-boost::${Environment}-${AWS::Region}:userPoolId
-  SBUserPoolClient:
-    Description: SaaS Boost User Pool Client id
-    Value: !Ref ConsoleUserPoolClient
-    Export:
-      Name: !Sub saas-boost::${Environment}-${AWS::Region}:userPoolClientId
-  SBIdentityPool:
-    Description: SaaS Boost Identity Pool Id
-    Value: !Ref ConsoleIdentityPool
-    Export:
-      Name: !Sub saas-boost::${Environment}-${AWS::Region}:identityPoolId
+  # SBUserPool:
+  #   Description: SaaS Boost User Pool Id
+  #   Value: !Ref ConsoleUserPool
+  #   Export:
+  #     Name: !Sub saas-boost::${Environment}-${AWS::Region}:userPoolId
+  # SBUserPoolClient:
+  #   Description: SaaS Boost User Pool Client id
+  #   Value: !Ref ConsoleUserPoolClient
+  #   Export:
+  #     Name: !Sub saas-boost::${Environment}-${AWS::Region}:userPoolClientId
+  # SBIdentityPool:
+  #   Description: SaaS Boost Identity Pool Id
+  #   Value: !Ref ConsoleIdentityPool
+  #   Export:
+  #     Name: !Sub saas-boost::${Environment}-${AWS::Region}:identityPoolId
   CloudFrontDistributionUrl:
     Description: Saas Boost Cloudfront distribution URL
     Value: !Sub https://${ConsoleCloudFrontDistribution.DomainName}

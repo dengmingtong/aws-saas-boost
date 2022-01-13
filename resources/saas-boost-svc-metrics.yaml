@@ -112,15 +112,15 @@ Resources:
             Effect: Allow
             Principal:
               AWS:
-                Fn::Join: ['', ['arn:aws:iam::', !FindInMap [Region2ELBAccountId, !Ref 'AWS::Region', 'AccountId'], ':root']]
+                Fn::Join: ['', ['arn:aws-cn:iam::', !FindInMap [Region2ELBAccountId, !Ref 'AWS::Region', 'AccountId'], ':root']]
             Action: s3:PutObject
-            Resource: !Sub arn:aws:s3:::${ALBAccessLogs}/access-logs/AWSLogs/${AWS::AccountId}/*
+            Resource: !Sub arn:aws-cn:s3:::${ALBAccessLogs}/access-logs/AWSLogs/${AWS::AccountId}/*
           - Sid: AWSLogDeliveryWrite
             Effect: Allow
             Principal:
               Service: delivery.logs.amazonaws.com
             Action: s3:PutObject
-            Resource: !Sub arn:aws:s3:::${ALBAccessLogs}/access-logs/AWSLogs/${AWS::AccountId}/*
+            Resource: !Sub arn:aws-cn:s3:::${ALBAccessLogs}/access-logs/AWSLogs/${AWS::AccountId}/*
             Condition:
               StringEquals:
                 s3:x-amz-acl: bucket-owner-full-control
@@ -129,14 +129,14 @@ Resources:
             Principal:
               Service: delivery.logs.amazonaws.com
             Action: s3:GetBucketAcl
-            Resource: !Sub arn:aws:s3:::${ALBAccessLogs}
+            Resource: !Sub arn:aws-cn:s3:::${ALBAccessLogs}
           - Sid: DenyNonHttps
             Effect: Deny
             Action: s3:*
             Principal: '*'
             Resource:
-              - !Sub arn:aws:s3:::${ALBAccessLogs}/*
-              - !Sub arn:aws:s3:::${ALBAccessLogs}
+              - !Sub arn:aws-cn:s3:::${ALBAccessLogs}/*
+              - !Sub arn:aws-cn:s3:::${ALBAccessLogs}
             Condition:
               Bool: { 'aws:SecureTransport': false }
   AccessLogsTable:
@@ -254,14 +254,14 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                   - logs:CreateLogGroup
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - s3:PutObject
@@ -272,8 +272,8 @@ Resources:
                   - s3:ListMultipartUploadParts
                   - s3:GetBucketLocation
                 Resource:
-                  - !Sub arn:aws:s3:::${AthenaOutput}
-                  - !Sub arn:aws:s3:::${AthenaOutput}/*
+                  - !Sub arn:aws-cn:s3:::${AthenaOutput}
+                  - !Sub arn:aws-cn:s3:::${AthenaOutput}/*
               - Effect: Allow
                 Action:
                   - s3:GetObject
@@ -289,12 +289,12 @@ Resources:
                   - glue:BatchCreatePartition
                   - glue:GetPartitions
                 Resource:
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${ALBAccessLogsDatabase}
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${ALBAccessLogsDatabase}/${AccessLogsTable}
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
-                  - !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary
-                  - !Sub arn:aws:s3:::${ALBAccessLogs}/*
-                  - !Sub arn:aws:s3:::${ALBAccessLogs}
+                  - !Sub arn:aws-cn:glue:${AWS::Region}:${AWS::AccountId}:database/${ALBAccessLogsDatabase}
+                  - !Sub arn:aws-cn:glue:${AWS::Region}:${AWS::AccountId}:table/${ALBAccessLogsDatabase}/${AccessLogsTable}
+                  - !Sub arn:aws-cn:glue:${AWS::Region}:${AWS::AccountId}:catalog
+                  - !Sub arn:aws-cn:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary
+                  - !Sub arn:aws-cn:s3:::${ALBAccessLogs}/*
+                  - !Sub arn:aws-cn:s3:::${ALBAccessLogs}
   # Request count metrics
   PublishRequestCountLog:
     Type: AWS::Logs::LogGroup
@@ -534,13 +534,13 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - cloudwatch:GetMetricData
@@ -551,11 +551,11 @@ Resources:
                   - ssm:GetParametersByPath
                   - ssm:GetParameters
                   - ssm:GetParameter
-                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*
+                Resource: !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*
               - Effect: Allow
                 Action:
                   - sts:AssumeRole
-                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+                Resource: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
   AlbAccessLogQueryFunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -583,13 +583,13 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - s3:PutObject
@@ -600,8 +600,8 @@ Resources:
                   - s3:ListMultipartUploadParts
                   - s3:GetBucketLocation
                 Resource:
-                  - !Sub arn:aws:s3:::${AthenaOutput}
-                  - !Sub arn:aws:s3:::${AthenaOutput}/*
+                  - !Sub arn:aws-cn:s3:::${AthenaOutput}
+                  - !Sub arn:aws-cn:s3:::${AthenaOutput}/*
               - Effect: Allow
                 Action:
                   - s3:GetObject
@@ -615,16 +615,16 @@ Resources:
                   - glue:GetDatabase
                   - glue:GetPartitions
                 Resource:
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${ALBAccessLogsDatabase}
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${ALBAccessLogsDatabase}/${AccessLogsTable}
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
-                  - !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary
-                  - !Sub arn:aws:s3:::${ALBAccessLogs}/*
-                  - !Sub arn:aws:s3:::${ALBAccessLogs}
+                  - !Sub arn:aws-cn:glue:${AWS::Region}:${AWS::AccountId}:database/${ALBAccessLogsDatabase}
+                  - !Sub arn:aws-cn:glue:${AWS::Region}:${AWS::AccountId}:table/${ALBAccessLogsDatabase}/${AccessLogsTable}
+                  - !Sub arn:aws-cn:glue:${AWS::Region}:${AWS::AccountId}:catalog
+                  - !Sub arn:aws-cn:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary
+                  - !Sub arn:aws-cn:s3:::${ALBAccessLogs}/*
+                  - !Sub arn:aws-cn:s3:::${ALBAccessLogs}
               - Effect: Allow
                 Action:
                   - sts:AssumeRole
-                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+                Resource: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
   MetricsPresignedUrlFunctionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -647,13 +647,13 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - s3:GetObject
@@ -663,8 +663,8 @@ Resources:
                   - s3:ListMultipartUploadParts
                   - s3:GetBucketLocation
                 Resource:
-                  - !Sub arn:aws:s3:::${AthenaOutput}
-                  - !Sub arn:aws:s3:::${AthenaOutput}/*
+                  - !Sub arn:aws-cn:s3:::${AthenaOutput}
+                  - !Sub arn:aws-cn:s3:::${AthenaOutput}/*
   MetricServiceQueryLogs:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -691,7 +691,7 @@ Resources:
           S3_ATHENA_BUCKET: !Ref AthenaOutput
           S3_ATHENA_OUTPUT_PATH: !Sub s3://${AthenaOutput}/query-results/
           ACCESS_LOGS_TABLE: !Ref AccessLogsTable
-          API_TRUST_ROLE: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+          API_TRUST_ROLE: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
           API_GATEWAY_HOST: !Sub ${SaaSBoostPrivateApi}.execute-api.${AWS::Region}.amazonaws.com
           API_GATEWAY_STAGE: !Ref PrivateApiStage
       Tags:
@@ -759,7 +759,7 @@ Resources:
           S3_ATHENA_BUCKET: !Ref AthenaOutput
           S3_ATHENA_OUTPUT_PATH: !Sub s3://${AthenaOutput}/query-results/
           ACCESS_LOGS_TABLE: !Ref AccessLogsTable
-          API_TRUST_ROLE: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+          API_TRUST_ROLE: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
           API_GATEWAY_HOST: !Sub ${SaaSBoostPrivateApi}.execute-api.${AWS::Region}.amazonaws.com
           API_GATEWAY_STAGE: !Ref PrivateApiStage
       Tags:

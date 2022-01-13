@@ -105,7 +105,7 @@ Resources:
             },
             "ProvisionTenant": {
               "Type": "Task",
-              "Resource": "arn:aws:states:${AWS::Region}:${AWS::AccountId}:lambda:invoke",
+              "Resource": "arn:aws-cn:states:${AWS::Region}:${AWS::AccountId}:lambda:invoke",
               "Parameters": {
                 "FunctionName": "${OnboardingServiceProvisionTenant.Arn}",
                 "Payload": {
@@ -180,19 +180,19 @@ Resources:
               - Effect: Allow
                 Action:
                   - logs:PutLogEvents
-                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                Resource: !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - dynamodb:Scan
                   - dynamodb:BatchWriteItem
                 Resource:
-                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CidrBlockTable}
+                  - !Sub arn:aws-cn:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CidrBlockTable}
   PopulateDynamoDBLogs:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -241,21 +241,21 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:DescribeLogGroups
                   - logs:DescribeLogStreams
                   - logs:CreateLogStream
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
                   - logs:PutRetentionPolicy
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/ecs/tenant*
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tenant*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:/ecs/tenant*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tenant*
               - Effect: Allow
                 Action:
                   - dynamodb:DescribeTable
@@ -266,41 +266,41 @@ Resources:
                   - dynamodb:Query
                   - dynamodb:UpdateItem
                 Resource:
-                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${OnboardingTable}
-                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CidrBlockTable}
+                  - !Sub arn:aws-cn:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${OnboardingTable}
+                  - !Sub arn:aws-cn:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CidrBlockTable}
               - Effect: Allow
                 Action:
                   - states:StartExecution
                 Resource:
-                  - !Sub arn:aws:states:${AWS::Region}:${AWS::AccountId}:stateMachine:sb-${Environment}-onboarding
+                  - !Sub arn:aws-cn:states:${AWS::Region}:${AWS::AccountId}:stateMachine:sb-${Environment}-onboarding
               - Effect: Allow
                 Action:
                   - cloudformation:CreateStack
                 Resource:
-                  - !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Tenant-*
+                  - !Sub arn:aws-cn:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Tenant-*
               - Effect: Allow
                 Action:
                   - cloudformation:UpdateStack
                 Resource:
-                  - !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/sb-${Environment}*
-                  - !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Tenant-*
+                  - !Sub arn:aws-cn:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/sb-${Environment}*
+                  - !Sub arn:aws-cn:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Tenant-*
               - Effect: Allow
                 Action:
                   - s3:ListBucket
                 Resource:
-                  - !Sub arn:aws:s3:::${SaaSBoostBucket}
+                  - !Sub arn:aws-cn:s3:::${SaaSBoostBucket}
               - Effect: Allow
                 Action:
                   - s3:Get*
                   - s3:PutObject
                   - s3:DeleteObject
                 Resource:
-                  - !Sub arn:aws:s3:::${SaaSBoostBucket}/*
+                  - !Sub arn:aws-cn:s3:::${SaaSBoostBucket}/*
               - Effect: Allow
                 Action:
                   - sns:Publish
                 Resource:
-                  - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:sb-*
+                  - !Sub arn:aws-cn:sns:${AWS::Region}:${AWS::AccountId}:sb-*
               - Effect: Allow
                 Action:
                   - ssm:Get*
@@ -308,8 +308,8 @@ Resources:
                   # This is for the AD stack -- need to figure out why update DNS wants to delete its SSM params
                   - ssm:DeleteParameter
                 Resource:
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/*
-                  - arn:aws:ssm:*:*:parameter/aws/service/ami-windows-latest/*
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/*
+                  - arn:aws-cn:ssm:*:*:parameter/aws/service/ami-windows-latest/*
               - Effect: Allow
                 Action:
                   - ec2:CreateInternetGateway
@@ -328,61 +328,61 @@ Resources:
                 Action:
                   - ec2:CreateTags
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:internet-gateway/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:route-table/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:internet-gateway/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:route-table/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
               - Effect: Allow
                 Action:
                   - ssm:AddTagsToResource
-                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*
+                Resource: !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*
               - Effect: Allow
                 Action:
                   - ec2:AuthorizeSecurityGroupIngress
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
               - Effect: Allow
                 Action:
                   - ec2:CreateRoute
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:route-table/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:route-table/*
               - Effect: Allow
                 Action:
                   - ec2:CreateTransitGatewayVpcAttachment
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
               - Effect: Allow
                 Action:
                   - ec2:CreateTransitGatewayRoute
                   - ec2:AssociateTransitGatewayRouteTable
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-route-table/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-route-table/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
               - Effect: Allow
                 Action:
                   - elasticloadbalancing:CreateTargetGroup
                   - elasticloadbalancing:ModifyTargetGroupAttributes
                 Resource:
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*/*
               - Effect: Allow
                 Action:
                   - elasticloadbalancing:CreateLoadBalancer
                   - elasticloadbalancing:ModifyLoadBalancerAttributes
                   - elasticloadbalancing:CreateListener
                 Resource:
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/*/*
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/net/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/net/*/*
               - Effect: Allow
                 Action:
                   - elasticloadbalancing:CreateRule
                 Resource:
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/app/*/*
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/net/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/app/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/net/*/*
               - Effect: Allow
                 Action:
                   - iam:GetRole
@@ -391,19 +391,19 @@ Resources:
                   - iam:PutRolePolicy
                   - iam:PassRole
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/*tenant*
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/sb-${Environment}-rds-bootstrap-role-${AWS::Region}
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/*tenant*
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-${Environment}-rds-bootstrap-role-${AWS::Region}
               - Effect: Allow
                 Action:
                   - iam:CreateInstanceProfile
                   - iam:AddRoleToInstanceProfile
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:instance-profile/Tenant-*
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:instance-profile/Tenant-*
               - Effect: Allow
                 Action:
                   - iam:CreateServiceLinkedRole
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
                 Condition:
                   StringLike:
                     iam:AWSServiceName:
@@ -412,18 +412,18 @@ Resources:
                 Action:
                   - iam:PassRole
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
               - Effect: Allow
                 Action:
                   - sts:AssumeRole
-                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+                Resource: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
               - Effect: Allow
                 Action:
                   - ecs:DescribeClusters
                   - ecs:PutClusterCapacityProviders                  
                 Resource:
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/tenant*
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:capacity-provider/*
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:cluster/tenant*
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:capacity-provider/*
               - Effect: Allow
                 Action:
                   - ecs:CreateService
@@ -431,8 +431,8 @@ Resources:
                   - ecs:UpdateService
                   - ecs:DescribeCapacityProviders
                 Resource:
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/tenant*
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:capacity-provider/*
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:service/tenant*
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:capacity-provider/*
               - Effect: Allow
                 Action:
                   - codepipeline:CreatePipeline
@@ -440,7 +440,7 @@ Resources:
                   - codepipeline:GetPipelineState
                   - codepipeline:UpdatePipeline
                 Resource:
-                  - !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:tenant*
+                  - !Sub arn:aws-cn:codepipeline:${AWS::Region}:${AWS::AccountId}:tenant*
               - Effect: Allow
                 Action:
                   - route53:GetHostedZone
@@ -450,7 +450,7 @@ Resources:
                   - route53:ListQueryLoggingConfigs
                   - route53:DeleteHostedZone
                 Resource:
-                  - arn:aws:route53:::hostedzone/*
+                  - arn:aws-cn:route53:::hostedzone/*
               - Effect: Allow
                 Action:
                   - route53:CreateHostedZone
@@ -481,13 +481,13 @@ Resources:
                 - kms:CreateAlias
                 - kms:UpdateAlias
                 Resource:
-                - !Sub arn:aws:kms:*:${AWS::AccountId}:alias/*
-                - !Sub arn:aws:kms:*:${AWS::AccountId}:key/*
+                - !Sub arn:aws-cn:kms:*:${AWS::AccountId}:alias/*
+                - !Sub arn:aws-cn:kms:*:${AWS::AccountId}:key/*
               - Effect: Allow
                 Action:
                   - route53:GetChange
                 Resource:
-                  - arn:aws:route53:::change/*
+                  - arn:aws-cn:route53:::change/*
               - Effect: Allow
                 Action:
                   - elasticfilesystem:Describe*
@@ -498,48 +498,48 @@ Resources:
                   - fsx:CreateFileSystem
                   - fsx:TagResource
                 Resource:
-                  - !Sub arn:aws:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:file-system/*
-                  - !Sub arn:aws:fsx:${AWS::Region}:${AWS::AccountId}:file-system/*
+                  - !Sub arn:aws-cn:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:file-system/*
+                  - !Sub arn:aws-cn:fsx:${AWS::Region}:${AWS::AccountId}:file-system/*
               - Effect: Allow
                 Action:
                   - rds:DescribeDBClusters
                 Resource:
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
               - Effect: Allow
                 Action:
                   - rds:CreateDBCluster
                   - rds:AddTagsToResource
                   - rds:RemoveTagsFromResource
                 Resource:
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster-pg:*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster-pg:*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
               - Effect: Allow
                 Action:
                   - rds:DescribeDBSubnetGroups
                   - rds:CreateDBSubnetGroup
                 Resource:
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
               - Effect: Allow
                 Action:
                   - rds:DescribeDBInstances
                   - rds:CreateDBInstance
                   - rds:AddTagsToResource
                 Resource:
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:secgrp:*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:db:*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:secgrp:*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
               - Effect: Allow
                 Action:
                   - events:PutEvents
                 Resource:
-                  - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/${SaaSBoostEventBus}
+                  - !Sub arn:aws-cn:events:${AWS::Region}:${AWS::AccountId}:event-bus/${SaaSBoostEventBus}
               - Effect: Allow
                 Action:
                   - autoscaling:CreateLaunchConfiguration
                 Resource:
-                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:launchConfiguration:*:launchConfigurationName/Tenant-*
+                  - !Sub arn:aws-cn:autoscaling:${AWS::Region}:${AWS::AccountId}:launchConfiguration:*:launchConfigurationName/Tenant-*
               - Effect: Allow
                 Action:
                   - autoscaling:CreateAutoScalingGroup
@@ -548,12 +548,12 @@ Resources:
                   - autoscaling:ResumeProcesses
                   - autoscaling:CreateOrUpdateTags
                 Resource:
-                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/tenant-*
+                  - !Sub arn:aws-cn:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/tenant-*
               - Effect: Allow
                 Action:
                   - ecr:ListImages
                 Resource:
-                  - !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ECSRepository}
+                  - !Sub arn:aws-cn:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ECSRepository}
               - Effect: Allow
                 Action:
                   - lambda:Get*
@@ -561,19 +561,19 @@ Resources:
                   - lambda:InvokeFunction
                   - lambda:UpdateFunctionCode
                 Resource:
-                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:tenant*
+                  - !Sub arn:aws-cn:lambda:${AWS::Region}:${AWS::AccountId}:function:tenant*
               - Effect: Allow
                 Action:
                   - ec2:RevokeSecurityGroupEgress
                   - ec2:AuthorizeSecurityGroupEgress
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
               # This is for the AD stack -- need to figure out why update DNS wants to delete the directory
               - Effect: Allow
                 Action:
                   - ds:DeleteDirectory
                 Resource:
-                  - !Sub arn:aws:ds:${AWS::Region}:${AWS::AccountId}:directory/*
+                  - !Sub arn:aws-cn:ds:${AWS::Region}:${AWS::AccountId}:directory/*
   OnboardingServiceDeleteTenantExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -597,22 +597,22 @@ Resources:
                 Action:
                   - logs:PutLogEvents
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:DescribeLogGroups
                   - logs:DescribeLogStreams
                   - logs:CreateLogStream
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
                   - logs:PutRetentionPolicy
                   - logs:DeleteLogGroup
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/ecs/tenant*
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tenant*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:/ecs/tenant*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/tenant*
               - Effect: Allow
                 Action:
                   - dynamodb:DescribeTable
@@ -623,26 +623,26 @@ Resources:
                   - dynamodb:Query
                   - dynamodb:UpdateItem
                 Resource:
-                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${OnboardingTable}
-                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CidrBlockTable}
+                  - !Sub arn:aws-cn:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${OnboardingTable}
+                  - !Sub arn:aws-cn:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${CidrBlockTable}
               - Effect: Allow
                 Action:
                   - cloudformation:DeleteStack
                 Resource:
-                  - !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Tenant-*
+                  - !Sub arn:aws-cn:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Tenant-*
               - Effect: Allow
                 Action:
                   - sns:Publish
                 Resource:
-                  - !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:sb-*
+                  - !Sub arn:aws-cn:sns:${AWS::Region}:${AWS::AccountId}:sb-*
               - Effect: Allow
                 Action:
                   - ssm:GetParameter
                   - ssm:GetParameters
                   - ssm:PutParameter
                 Resource:
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/*
-                  - arn:aws:ssm:*:*:parameter/aws/service/ami-windows-latest/*
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/*
+                  - arn:aws-cn:ssm:*:*:parameter/aws/service/ami-windows-latest/*
               - Effect: Allow
                 Action:
                   - ec2:DeleteInternetGateway
@@ -663,75 +663,75 @@ Resources:
                 Action:
                   - ec2:DeleteTags
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:internet-gateway/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:route-table/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:internet-gateway/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:route-table/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
               - Effect: Allow
                 Action:
                   - ec2:RevokeSecurityGroupIngress
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
               - Effect: Allow
                 Action:
                   - ec2:DeleteRoute
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:route-table/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:route-table/*
               - Effect: Allow
                 Action:
                   - ec2:DeleteTransitGatewayVpcAttachment
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:vpc/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:subnet/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
               - Effect: Allow
                 Action:
                   - ec2:DeleteTransitGatewayRoute
                   - ec2:DisassociateTransitGatewayRouteTable
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-route-table/*
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-route-table/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:transit-gateway-attachment/*
               - Effect: Allow
                 Action:
                   - elasticloadbalancing:DeleteTargetGroup
                 Resource:
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:targetgroup/*/*
               - Effect: Allow
                 Action:
                   - elasticloadbalancing:DeleteLoadBalancer
                 Resource:
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/*/*
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/net/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/net/*/*
               - Effect: Allow
                 Action:
                   - elasticloadbalancing:DeleteRule
                   - elasticloadbalancing:DeleteListener
                 Resource:
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/app/*/*
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/net/*/*
-                  - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener-rule/app/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/app/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener/net/*/*
+                  - !Sub arn:aws-cn:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:listener-rule/app/*
               - Effect: Allow
                 Action:
                   - iam:GetRolePolicy
                   - iam:DeleteRole
                   - iam:DeleteRolePolicy
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/*tenant*
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/sb-${Environment}-rds-bootstrap-role-${AWS::Region}
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/*tenant*
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-${Environment}-rds-bootstrap-role-${AWS::Region}
               - Effect: Allow
                 Action:
                   - iam:DeleteInstanceProfile
                   - iam:RemoveRoleFromInstanceProfile
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:instance-profile/Tenant-*
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:instance-profile/Tenant-*
               - Effect: Allow
                 Action:
                   - iam:DeleteServiceLinkedRole
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
                 Condition:
                   StringLike:
                     iam:AWSServiceName:
@@ -740,22 +740,22 @@ Resources:
                 Action:
                   - iam:PassRole
                 Resource:
-                  - !Sub arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+                  - !Sub arn:aws-cn:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
               - Effect: Allow
                 Action:
                   - sts:AssumeRole
-                Resource: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+                Resource: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
               - Effect: Allow
                 Action:
                   - ecs:DescribeClusters
                 Resource:
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/tenant*
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:cluster/tenant*
               - Effect: Allow
                 Action:
                   - ecs:DescribeClusters
                   - ecs:PutClusterCapacityProviders                  
                 Resource:
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/tenant*                  
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:cluster/tenant*                  
               - Effect: Allow
                 Action:
                   - ecs:DescribeServices
@@ -763,15 +763,15 @@ Resources:
                   - ecs:DeleteCapacityProvider
                   - ecs:DescribeCapacityProviders
                 Resource:
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:service/tenant*
-                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:capacity-provider/tenant*                  
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:service/tenant*
+                  - !Sub arn:aws-cn:ecs:${AWS::Region}:${AWS::AccountId}:capacity-provider/tenant*                  
               - Effect: Allow
                 Action:
                   - codepipeline:GetPipeline
                   - codepipeline:GetPipelineState
                   - codepipeline:DeletePipeline
                 Resource:
-                  - !Sub arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:tenant*
+                  - !Sub arn:aws-cn:codepipeline:${AWS::Region}:${AWS::AccountId}:tenant*
               - Effect: Allow
                 Action:
                   - route53:GetHostedZone
@@ -780,7 +780,7 @@ Resources:
                   - route53:DeleteHostedZone
                   - route53:ChangeResourceRecordSets
                 Resource:
-                  - arn:aws:route53:::hostedzone/*
+                  - arn:aws-cn:route53:::hostedzone/*
               - Effect: Allow
                 Action:
                   - elasticfilesystem:DeleteFileSystem
@@ -802,7 +802,7 @@ Resources:
                 Action:
                   - route53:GetChange
                 Resource:
-                  - arn:aws:route53:::change/*
+                  - arn:aws-cn:route53:::change/*
               - Effect: Allow
                 Action:
                   - elasticfilesystem:DescribeFileSystems
@@ -813,61 +813,61 @@ Resources:
                   - fsx:DescribeFileSystems
                   - fsx:DeleteFileSystem
                 Resource:
-                  - !Sub arn:aws:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:file-system/*
-                  - !Sub arn:aws:fsx:${AWS::Region}:${AWS::AccountId}:file-system/*
+                  - !Sub arn:aws-cn:elasticfilesystem:${AWS::Region}:${AWS::AccountId}:file-system/*
+                  - !Sub arn:aws-cn:fsx:${AWS::Region}:${AWS::AccountId}:file-system/*
               - Effect: Allow
                 Action:
                   - rds:DescribeDBClusters                  
                 Resource:
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
               - Effect: Allow
                 Action:
                   - rds:DeleteDBCluster
                   - rds:CreateDBClusterSnapshot
                   - rds:DescribeDBClusterSnapshots
                 Resource:
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster-pg:*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster-snapshot:*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster-pg:*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster-snapshot:*
               - Effect: Allow
                 Action:
                   - rds:DescribeDBSubnetGroups
                   - rds:DeleteDBSubnetGroup
                 Resource:
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
               - Effect: Allow
                 Action:
                   - rds:DescribeDBInstances
                   - rds:DeleteDBInstance
                   - rds:RemoveTagsFromResource
                 Resource:
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:secgrp:*
-                  - !Sub arn:aws:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:db:*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:cluster:tenant*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:secgrp:*
+                  - !Sub arn:aws-cn:rds:${AWS::Region}:${AWS::AccountId}:subgrp:tenant*
               - Effect: Allow
                 Action:
                   - events:PutEvents
                 Resource:
-                  - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/${SaaSBoostEventBus}
+                  - !Sub arn:aws-cn:events:${AWS::Region}:${AWS::AccountId}:event-bus/${SaaSBoostEventBus}
               - Effect: Allow
                 Action:
                   - autoscaling:DeleteLaunchConfiguration
                 Resource:
-                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:launchConfiguration:*:launchConfigurationName/Tenant-*
+                  - !Sub arn:aws-cn:autoscaling:${AWS::Region}:${AWS::AccountId}:launchConfiguration:*:launchConfigurationName/Tenant-*
               - Effect: Allow
                 Action:
                   - autoscaling:DeleteAutoScalingGroup
                   - autoscaling:UpdateAutoScalingGroup
                   - autoscaling:SuspendProcesses
                 Resource:
-                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/tenant-*
+                  - !Sub arn:aws-cn:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/tenant-*
               - Effect: Allow
                 Action:
                   - ecr:ListImages
                 Resource:
-                  - !Sub arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ECSRepository}
+                  - !Sub arn:aws-cn:ecr:${AWS::Region}:${AWS::AccountId}:repository/${ECSRepository}
               - Effect: Allow
                 Action:
                   - lambda:GetFunction
@@ -875,18 +875,18 @@ Resources:
                   - lambda:InvokeFunction
                   - lambda:DeleteFunction
                 Resource:
-                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:tenant*
+                  - !Sub arn:aws-cn:lambda:${AWS::Region}:${AWS::AccountId}:function:tenant*
               - Effect: Allow
                 Action:
                   - ssm:Get*
                   - ssm:DeleteParameter
                 Resource:
-                  - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/*                
+                  - !Sub arn:aws-cn:ssm:${AWS::Region}:${AWS::AccountId}:parameter/saas-boost/${Environment}/*                
               - Effect: Allow
                 Action:
                   - ec2:RevokeSecurityGroupEgress
                 Resource:
-                  - !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
+                  - !Sub arn:aws-cn:ec2:${AWS::Region}:${AWS::AccountId}:security-group/*
   OnboardingServiceGetAllLogs:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -969,7 +969,7 @@ Resources:
         Variables:
           ONBOARDING_TABLE: !Ref OnboardingTable
           ONBOARDING_WORKFLOW: !Ref OnboardingWorkflow
-          API_TRUST_ROLE: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+          API_TRUST_ROLE: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
           API_GATEWAY_HOST: !Sub ${SaaSBoostPrivateApi}.execute-api.${AWS::Region}.amazonaws.com
           API_GATEWAY_STAGE: !Ref PrivateApiStage
           ECR_REPO: !Ref ECSRepository
@@ -1036,7 +1036,7 @@ Resources:
           SAAS_BOOST_ENV: !Ref Environment
           ONBOARDING_TABLE: !Ref OnboardingTable
           CIDR_BLOCK_TABLE: !Ref CidrBlockTable
-          API_TRUST_ROLE: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+          API_TRUST_ROLE: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
           API_GATEWAY_HOST: !Sub ${SaaSBoostPrivateApi}.execute-api.${AWS::Region}.amazonaws.com
           API_GATEWAY_STAGE: !Ref PrivateApiStage
       Tags:
@@ -1072,7 +1072,7 @@ Resources:
           SAAS_BOOST_ENV: !Ref Environment
           ONBOARDING_TABLE: !Ref OnboardingTable
           CIDR_BLOCK_TABLE: !Ref CidrBlockTable
-          API_TRUST_ROLE: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+          API_TRUST_ROLE: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
           API_GATEWAY_HOST: !Sub ${SaaSBoostPrivateApi}.execute-api.${AWS::Region}.amazonaws.com
           API_GATEWAY_STAGE: !Ref PrivateApiStage
       Tags:
@@ -1179,7 +1179,7 @@ Resources:
       Environment:
         Variables:
           ONBOARDING_TABLE: !Ref OnboardingTable
-          API_TRUST_ROLE: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+          API_TRUST_ROLE: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
           API_GATEWAY_HOST: !Sub ${SaaSBoostPrivateApi}.execute-api.${AWS::Region}.amazonaws.com
           API_GATEWAY_STAGE: !Ref PrivateApiStage
       Tags:
@@ -1212,7 +1212,7 @@ Resources:
       Environment:
         Variables:
           ONBOARDING_TABLE: !Ref OnboardingTable
-          API_TRUST_ROLE: !Sub arn:aws:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
+          API_TRUST_ROLE: !Sub arn:aws-cn:iam::${AWS::AccountId}:role/sb-private-api-trust-role-${Environment}-${AWS::Region}
           API_GATEWAY_HOST: !Sub ${SaaSBoostPrivateApi}.execute-api.${AWS::Region}.amazonaws.com
           API_GATEWAY_STAGE: !Ref PrivateApiStage
       Tags:

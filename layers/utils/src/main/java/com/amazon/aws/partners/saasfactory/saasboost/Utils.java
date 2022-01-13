@@ -79,7 +79,8 @@ public class Utils {
 				char escapedCharacter = quotedJson.charAt(index);
 				index++;
 
-				if (escapedCharacter == '"' || escapedCharacter == '\\' || escapedCharacter == '/' || escapedCharacter == '\'') {
+				if (escapedCharacter == '"' || escapedCharacter == '\\' || escapedCharacter == '/'
+						|| escapedCharacter == '\'') {
 					// If the character after the backslash is another slash or a quote
 					// then add it to the JSON string we're building. Normal use case is
 					// that the next character should be a double quote mark.
@@ -153,14 +154,17 @@ public class Utils {
 		return object;
 	}
 
-	public static <B extends AwsSyncClientBuilder<B, C> & AwsClientBuilder<?, C>, C> C sdkClient(AwsSyncClientBuilder<B, C> builder, String service) {
+	public static <B extends AwsSyncClientBuilder<B, C> & AwsClientBuilder<?, C>, C> C sdkClient(
+			AwsSyncClientBuilder<B, C> builder, String service) {
 		Region signingRegion = Region.of(System.getenv("AWS_REGION"));
-		String endpoint = "https://" + service + "." + signingRegion.toString() + ".amazonaws.com";
+		String endpoint = "https://" + service + "." + signingRegion.toString() + ".amazonaws.com.cn";
+
 		// Route53 doesn't follow the rules...
 		if ("route53".equals(service)) {
 			signingRegion = Region.AWS_GLOBAL;
-			endpoint = "https://route53.amazonaws.com";
+			endpoint = "https://route53.amazonaws.com.cn";
 		}
+		LOGGER.info("For Debug, Service {}, endpoint {}", service, endpoint);
 		C client = builder
 				.httpClientBuilder(UrlConnectionHttpClient.builder())
 				.credentialsProvider(EnvironmentVariableCredentialsProvider.create())
@@ -172,10 +176,8 @@ public class Utils {
 								.throttlingBackoffStrategy(BackoffStrategy.defaultThrottlingStrategy())
 								.numRetries(SdkDefaultRetrySetting.defaultMaxAttempts())
 								.retryCondition(RetryCondition.defaultRetryCondition())
-								.build()
-						)
-						.build()
-				)
+								.build())
+						.build())
 				.build();
 		return client;
 	}
@@ -227,7 +229,8 @@ public class Utils {
 		try (InputStream propertiesFile = clazz.getClassLoader().getResourceAsStream(GIT_PROPERTIES_FILENAME)) {
 			Properties versionProperties = new Properties();
 			versionProperties.load(propertiesFile);
-			version = versionProperties.getProperty("git.commit.id.describe") + ", Commit time: " + versionProperties.getProperty("git.commit.time");
+			version = versionProperties.getProperty("git.commit.id.describe") + ", Commit time: "
+					+ versionProperties.getProperty("git.commit.time");
 		} catch (Exception e) {
 			LOGGER.error("Error loading version info from {} for {}", GIT_PROPERTIES_FILENAME, clazz.getName());
 			LOGGER.error(Utils.getFullStackTrace(e));

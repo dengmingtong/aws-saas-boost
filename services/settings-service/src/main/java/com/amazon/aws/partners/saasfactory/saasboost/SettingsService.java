@@ -56,27 +56,30 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
             .of(new AbstractMap.SimpleEntry<>("Access-Control-Allow-Origin", "*"))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     final static List<String> REQUIRED_PARAMS = Collections.unmodifiableList(
-            Arrays.asList("SAAS_BOOST_BUCKET", "CODE_PIPELINE_BUCKET", "CODE_PIPELINE_ROLE", "ECR_REPO", "ONBOARDING_WORKFLOW",
-                    "ONBOARDING_SNS", "ONBOARDING_TEMPLATE", "TRANSIT_GATEWAY", "TRANSIT_GATEWAY_ROUTE_TABLE", "EGRESS_ROUTE_TABLE",
-                    "SAAS_BOOST_ENVIRONMENT", "SAAS_BOOST_STACK", "SAAS_BOOST_LAMBDAS_FOLDER")
-    );
+            Arrays.asList("SAAS_BOOST_BUCKET", "CODE_PIPELINE_BUCKET", "CODE_PIPELINE_ROLE", "ECR_REPO",
+                    "ONBOARDING_WORKFLOW",
+                    "ONBOARDING_SNS", "ONBOARDING_TEMPLATE", "TRANSIT_GATEWAY", "TRANSIT_GATEWAY_ROUTE_TABLE",
+                    "EGRESS_ROUTE_TABLE",
+                    "SAAS_BOOST_ENVIRONMENT", "SAAS_BOOST_STACK", "SAAS_BOOST_LAMBDAS_FOLDER"));
     final static List<String> READ_WRITE_PARAMS = Collections.unmodifiableList(
-            Arrays.asList("DOMAIN_NAME", "HOSTED_ZONE", "SSL_CERT_ARN", "COMPUTE_SIZE", "TASK_CPU", "TASK_MEMORY", "CONTAINER_PORT", "HEALTH_CHECK", "APP_NAME",
-                    "FILE_SYSTEM_MOUNT_POINT", "FILE_SYSTEM_ENCRYPT", "FILE_SYSTEM_LIFECYCLE", "MIN_COUNT", "MAX_COUNT", "DB_ENGINE",
-                    "DB_VERSION", "DB_PARAM_FAMILY", "DB_INSTANCE_TYPE", "DB_NAME", "DB_HOST", "DB_PORT", "DB_MASTER_USERNAME",
-                    "DB_MASTER_PASSWORD", "DB_BOOTSTRAP_FILE", "METRICS_STREAM", "BILLING_API_KEY", "CLUSTER_OS", "CLUSTER_INSTANCE_TYPE",
-                    //Added for FSX
+            Arrays.asList("DOMAIN_NAME", "HOSTED_ZONE", "SSL_CERT_ARN", "COMPUTE_SIZE", "TASK_CPU", "TASK_MEMORY",
+                    "CONTAINER_PORT", "HEALTH_CHECK", "APP_NAME",
+                    "FILE_SYSTEM_MOUNT_POINT", "FILE_SYSTEM_ENCRYPT", "FILE_SYSTEM_LIFECYCLE", "MIN_COUNT", "MAX_COUNT",
+                    "DB_ENGINE",
+                    "DB_VERSION", "DB_PARAM_FAMILY", "DB_INSTANCE_TYPE", "DB_NAME", "DB_HOST", "DB_PORT",
+                    "DB_MASTER_USERNAME",
+                    "DB_MASTER_PASSWORD", "DB_BOOTSTRAP_FILE", "METRICS_STREAM", "BILLING_API_KEY", "CLUSTER_OS",
+                    "CLUSTER_INSTANCE_TYPE",
+                    // Added for FSX
                     "FILE_SYSTEM_TYPE", // EFS or FSX
                     "FSX_STORAGE_GB", // GB 32 to 65,536
                     "FSX_THROUGHPUT_MBS", // MB/s
                     "FSX_BACKUP_RETENTION_DAYS", // 7 to 35
-                    "FSX_DAILY_BACKUP_TIME", //HH:MM in UTC
-                    "FSX_WEEKLY_MAINTENANCE_TIME",//d:HH:MM in UTC
-                    "FSX_WINDOWS_MOUNT_DRIVE")
-    );
+                    "FSX_DAILY_BACKUP_TIME", // HH:MM in UTC
+                    "FSX_WEEKLY_MAINTENANCE_TIME", // d:HH:MM in UTC
+                    "FSX_WINDOWS_MOUNT_DRIVE"));
     final static List<String> TENANT_PARAMS = Collections.unmodifiableList(
-            Arrays.asList("DB_HOST", "ALB")
-    );
+            Arrays.asList("DB_HOST", "ALB"));
     private final SettingsServiceDAL dal;
     private final EventBridgeClient eventBridge;
     private final S3Client s3;
@@ -96,7 +99,12 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
             this.presigner = S3Presigner.builder()
                     .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
                     .region(Region.of(AWS_REGION))
-                    .endpointOverride(new URI("https://" + s3.serviceName() + "." + Region.of(AWS_REGION) + ".amazonaws.com")) // will break in China regions
+                    .endpointOverride(
+                            new URI("https://" + s3.serviceName() + "." + Region.of(AWS_REGION) + ".amazonaws.com.cn")) // will
+                                                                                                                        // break
+                                                                                                                        // in
+                                                                                                                        // China
+                                                                                                                        // regions
                     .build();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -106,21 +114,22 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(Map<String, Object> event, Context context) {
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
     }
 
     public APIGatewayProxyResponseEvent getSettings(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         List<Setting> settings = new ArrayList<>();
         Map<String, String> queryParams = (Map<String, String>) event.get("queryStringParameters");
-        Map<String, List<String>> multiValueQueryParams = (Map<String, List<String>>) event.get("multiValueQueryStringParameters");
+        Map<String, List<String>> multiValueQueryParams = (Map<String, List<String>>) event
+                .get("multiValueQueryStringParameters");
         // Only return one set of params
         if (queryParams != null && queryParams.containsKey("readOnly")) {
             if (Boolean.valueOf(queryParams.get("readOnly"))) {
@@ -149,12 +158,12 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent getSetting(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
         Map<String, String> params = (Map) event.get("pathParameters");
         String settingName = params.get("id");
@@ -175,12 +184,12 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent getSecret(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
         Map<String, String> params = (Map) event.get("pathParameters");
         String settingName = params.get("id");
@@ -201,12 +210,12 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent getParameterStoreReference(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
         Map<String, String> params = (Map) event.get("pathParameters");
         String settingName = params.get("id");
@@ -229,13 +238,13 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent updateSetting(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
         LOGGER.info("SettingsService::updateSetting");
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
         Map<String, String> params = (Map) event.get("pathParameters");
         String key = params.get("id");
@@ -249,7 +258,8 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                         .withBody("{\"message\":\"Empty request body.\"}");
             } else {
                 if (setting.getName() == null || !setting.getName().equals(key)) {
-                    LOGGER.error("SettingsService::updateSetting Can't update setting " + setting.getName() + " at resource " + key);
+                    LOGGER.error("SettingsService::updateSetting Can't update setting " + setting.getName()
+                            + " at resource " + key);
                     response = new APIGatewayProxyResponseEvent()
                             .withHeaders(CORS)
                             .withStatusCode(400)
@@ -282,12 +292,12 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent getTenantSettings(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
 
         Map<String, String> params = (Map) event.get("pathParameters");
         String tenantId = params.get("id");
@@ -312,12 +322,12 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent getTenantSetting(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
         Map<String, String> params = (Map) event.get("pathParameters");
         String tenantId = params.get("id");
@@ -349,7 +359,7 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent updateTenantSetting(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
@@ -371,7 +381,8 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                         .withBody("{\"message\":\"Invalid resource for setting.\"}");
             } else {
                 if (setting.getName() == null || !setting.getName().equals(key)) {
-                    LOGGER.error("SettingsService::updateTenantSetting Can't update setting " + setting.getName() + " at resource " + key);
+                    LOGGER.error("SettingsService::updateTenantSetting Can't update setting " + setting.getName()
+                            + " at resource " + key);
                     response = new APIGatewayProxyResponseEvent()
                             .withHeaders(CORS)
                             .withStatusCode(400)
@@ -398,7 +409,7 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent deleteTenantSettings(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
@@ -432,24 +443,24 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
             throw new IllegalStateException("Missing environment variable CLOUDFRONT_DISTRIBUTION");
         }
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
         LOGGER.info("SettingsService::configOptions");
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
 
         Map<String, Object> options = new HashMap<>();
         options.put("osOptions", Arrays.stream(OperatingSystem.values())
                 .collect(
-                        Collectors.toMap(OperatingSystem::name, OperatingSystem::getDescription)
-                ));
+                        Collectors.toMap(OperatingSystem::name, OperatingSystem::getDescription)));
         options.put("dbOptions", dal.rdsOptions());
 
         // Create a presigned S3 URL to upload the database bootstrap file to
-        String bucket = Utils.isNotBlank(SAAS_BOOST_BUCKET) ? SAAS_BOOST_BUCKET : dal.getSetting("SAAS_BOOST_BUCKET").getValue();
+        String bucket = Utils.isNotBlank(SAAS_BOOST_BUCKET) ? SAAS_BOOST_BUCKET
+                : dal.getSetting("SAAS_BOOST_BUCKET").getValue();
         String key = "bootstrap.sql";
         final Duration expires = Duration.ofMinutes(15); // UI times out in 10 min
 
@@ -461,7 +472,8 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
         } catch (S3Exception corsConfigError) {
             corsDoesntExists = corsConfigError.getMessage().startsWith("The CORS configuration does not exist");
         }
-        if (corsDoesntExists || (corsResponse != null && (!corsResponse.hasCorsRules() || corsResponse.corsRules().isEmpty()))) {
+        if (corsDoesntExists
+                || (corsResponse != null && (!corsResponse.hasCorsRules() || corsResponse.corsRules().isEmpty()))) {
             LOGGER.info("SaaS Boost bucket does not have a CORS policy yet");
             try {
                 PutBucketCorsResponse cors = s3.putBucketCors(request -> request
@@ -473,11 +485,8 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                                                 .allowedMethods("PUT").build(),
                                         CORSRule.builder()
                                                 .allowedOrigins(CLOUDFRONT_DISTRIBUTION)
-                                                .allowedMethods("PUT").build()
-                                ))
-                                .build()
-                        )
-                );
+                                                .allowedMethods("PUT").build()))
+                                .build()));
             } catch (SdkServiceException s3Error) {
                 LOGGER.error("S3 error placing CORS policy on SaaS Boost bucket", s3Error);
                 LOGGER.error(Utils.getFullStackTrace(s3Error));
@@ -490,10 +499,8 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                 .putObjectRequest(PutObjectRequest.builder()
                         .bucket(bucket)
                         .key(key)
-                        .build()
-                )
-                .build()
-        );
+                        .build())
+                .build());
         Map<String, Object> uploadOptions = new HashMap<>();
         uploadOptions.put("url", presignedObject.url());
         uploadOptions.put("headers", presignedObject.signedHeaders());
@@ -512,20 +519,20 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
     public APIGatewayProxyResponseEvent getAppConfig(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         final long startTimeMillis = System.currentTimeMillis();
         LOGGER.info("SettingsService::getAppConfig");
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
 
         AppConfig appConfig = dal.getAppConfig();
         response = new APIGatewayProxyResponseEvent()
-                    .withStatusCode(200)
-                    .withHeaders(CORS)
-                    .withBody(Utils.toJson(appConfig));
+                .withStatusCode(200)
+                .withHeaders(CORS)
+                .withBody(Utils.toJson(appConfig));
 
         long totalTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("SettingsService::getAppConfig exec " + totalTimeMillis);
@@ -537,7 +544,7 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
             throw new IllegalStateException("Missing environment variable SAAS_BOOST_EVENT_BUS");
         }
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
@@ -567,14 +574,17 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                 // Save all the settings for this app config
                 appConfig = dal.setAppConfig(appConfig);
 
-                // If they didn't tell the installer to use a domain name, but now have passed it in with
-                // app config, we need to update the CloudFormation stack so it will create a hosted zone
+                // If they didn't tell the installer to use a domain name, but now have passed
+                // it in with
+                // app config, we need to update the CloudFormation stack so it will create a
+                // hosted zone
                 if (AppConfigHelper.isDomainChanged(currentAppConfig, appConfig)) {
                     LOGGER.info("AppConfig domain name has changed");
                     triggerDomainNameChange();
                 }
 
-                // If billing is enabled, trigger the event to establish the master billing provider account
+                // If billing is enabled, trigger the event to establish the master billing
+                // provider account
                 // artifacts using the 3rd party API key the ISV provided as part of the config.
                 if (AppConfigHelper.isBillingChanged(currentAppConfig, appConfig) &&
                         AppConfigHelper.isBillingFirstTime(currentAppConfig, appConfig)) {
@@ -613,7 +623,7 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
             throw new IllegalStateException("Missing required environment variable API_TRUST_ROLE");
         }
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
@@ -645,8 +655,10 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                 }
 
                 if (AppConfigHelper.isBillingChanged(currentAppConfig, updatedAppConfig)) {
-                    String apiKey1 = currentAppConfig.getBilling() != null ? currentAppConfig.getBilling().getApiKey() : null;
-                    String apiKey2 = updatedAppConfig.getBilling() != null ? updatedAppConfig.getBilling().getApiKey() : null;
+                    String apiKey1 = currentAppConfig.getBilling() != null ? currentAppConfig.getBilling().getApiKey()
+                            : null;
+                    String apiKey2 = updatedAppConfig.getBilling() != null ? updatedAppConfig.getBilling().getApiKey()
+                            : null;
                     LOGGER.info("AppConfig billing provider has changed {} != {}", apiKey1, apiKey2);
                     if (AppConfigHelper.isBillingFirstTime(currentAppConfig, updatedAppConfig)) {
                         // 1. We didn't have a billing provider and now we do, trigger setup
@@ -659,8 +671,10 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                         LOGGER.info("AppConfig has removed the billing provider.");
                         // TODO how do we cleanup the billing provider integration?
                     } else {
-                        // 3. We had a billing provider and we're just changing the value of the key, that is
-                        // taken care of by dal.setAppConfig and we don't need to trigger a setup because
+                        // 3. We had a billing provider and we're just changing the value of the key,
+                        // that is
+                        // taken care of by dal.setAppConfig and we don't need to trigger a setup
+                        // because
                         // it's already been done.
                         LOGGER.info("AppConfig billing provider API key in-place change.");
                     }
@@ -668,7 +682,8 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
 
                 if (AppConfigHelper.isComputeChanged(currentAppConfig, updatedAppConfig) ||
                         AppConfigHelper.isAutoScalingChanged(currentAppConfig, updatedAppConfig)) {
-                    LOGGER.info("AppConfig compute and/or scaling has changed. Triggering update of default setting tenants.");
+                    LOGGER.info(
+                            "AppConfig compute and/or scaling has changed. Triggering update of default setting tenants.");
                     // Get all the provisioned tenants who have not customized
                     // their compute settings so we can update them to the new
                     // global settings.
@@ -676,12 +691,16 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                             .resource("tenants/provisioned?overrideDefaults=false")
                             .method("GET")
                             .build();
-                    SdkHttpFullRequest getTenantsApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE, getTenantsRequest);
+                    SdkHttpFullRequest getTenantsApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST,
+                            API_GATEWAY_STAGE, getTenantsRequest);
                     try {
-                        String getTenantsResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(getTenantsApiRequest, API_TRUST_ROLE, context.getAwsRequestId());
-                        ArrayList<Map<String, Object>> provisionedTenantsWithDefaultSettings = Utils.fromJson(getTenantsResponseBody, ArrayList.class);
+                        String getTenantsResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(getTenantsApiRequest,
+                                API_TRUST_ROLE, context.getAwsRequestId());
+                        ArrayList<Map<String, Object>> provisionedTenantsWithDefaultSettings = Utils
+                                .fromJson(getTenantsResponseBody, ArrayList.class);
                         if (provisionedTenantsWithDefaultSettings != null) {
-                            LOGGER.info("{} tenants with default settings to update", provisionedTenantsWithDefaultSettings.size());
+                            LOGGER.info("{} tenants with default settings to update",
+                                    provisionedTenantsWithDefaultSettings.size());
                             for (Map<String, Object> tenant : provisionedTenantsWithDefaultSettings) {
                                 // The onboarding service update tenant call expects to be given the
                                 // values to use as parameters for the CloudFormation stack.
@@ -700,7 +719,8 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                             }
                         }
                     } catch (Exception e) {
-                        LOGGER.error("Error invoking API " + API_GATEWAY_STAGE + "/tenants/provisioned?overrideDefaults=false");
+                        LOGGER.error("Error invoking API " + API_GATEWAY_STAGE
+                                + "/tenants/provisioned?overrideDefaults=false");
                         LOGGER.error(Utils.getFullStackTrace(e));
                         throw new RuntimeException(e);
                     }
@@ -722,10 +742,10 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
         LOGGER.info("SettingsService::updateAppConfig exec " + totalTimeMillis);
         return response;
     }
-    
+
     public APIGatewayProxyResponseEvent deleteAppConfig(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
@@ -737,8 +757,8 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
         try {
             dal.deleteAppConfig();
             response = new APIGatewayProxyResponseEvent()
-            .withHeaders(CORS)
-            .withStatusCode(200);
+                    .withHeaders(CORS)
+                    .withStatusCode(200);
         } catch (Exception e) {
             response = new APIGatewayProxyResponseEvent()
                     .withHeaders(CORS)
@@ -773,8 +793,7 @@ public class SettingsService implements RequestHandler<Map<String, Object>, APIG
                     .detail(Utils.toJson(detail))
                     .build();
             PutEventsResponse eventBridgeResponse = eventBridge.putEvents(r -> r
-                    .entries(event)
-            );
+                    .entries(event));
             for (PutEventsResultEntry entry : eventBridgeResponse.entries()) {
                 if (entry.eventId() != null && !entry.eventId().isEmpty()) {
                     LOGGER.info("Put event success {} {}", entry.toString(), event.toString());

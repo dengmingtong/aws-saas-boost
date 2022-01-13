@@ -43,29 +43,36 @@ public class OnboardingServiceTest {
         Integer minCount = null;
         Integer maxCount = null;
 
-        assertFalse("All nulls", (computeSize != null || memory != null || cpu != null || minCount != null || maxCount != null));
-        assertFalse("No overrides", OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
+        assertFalse("All nulls",
+                (computeSize != null || memory != null || cpu != null || minCount != null || maxCount != null));
+        assertFalse("No overrides",
+                OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
 
         computeSize = ComputeSize.S;
-        assertFalse("Invalid ASG override", OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
+        assertFalse("Invalid ASG override",
+                OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
 
         computeSize = null;
         memory = 2048;
         minCount = 1;
         maxCount = 2;
-        assertFalse("Invalid compute override", OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
+        assertFalse("Invalid compute override",
+                OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
 
         cpu = 1024;
         maxCount = null;
-        assertFalse("Invalid ASG override", OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
+        assertFalse("Invalid ASG override",
+                OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
 
         maxCount = 2;
-        assertTrue("Compute override", OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
+        assertTrue("Compute override",
+                OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
 
         memory = null;
         cpu = null;
         computeSize = ComputeSize.S;
-        assertTrue("T-Shirt override", OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
+        assertTrue("T-Shirt override",
+                OnboardingService.validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount));
     }
 
     @Test
@@ -92,8 +99,7 @@ public class OnboardingServiceTest {
                         new AbstractMap.SimpleEntry<String, String>("18", ""),
                         new AbstractMap.SimpleEntry<String, String>("19", ""),
                         new AbstractMap.SimpleEntry<String, String>("20", ""),
-                        new AbstractMap.SimpleEntry<String, String>("21", "")
-                )
+                        new AbstractMap.SimpleEntry<String, String>("21", ""))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         List<String> batch = new ArrayList<>();
@@ -140,9 +146,10 @@ public class OnboardingServiceTest {
     public void testOnboardingJson() throws Exception {
         Onboarding onboarding = new Onboarding();
         onboarding.setId(UUID.randomUUID());
-        onboarding.setStackId("arn:aws:cloudformation:us-west-2:111111111111:stack/Tenant-1d733861/b14b18a0-ebb8-11ea-9b5a-0a8a148431ae");
+        onboarding.setStackId(
+                "arn:aws-cn:cloudformation:us-west-2:111111111111:stack/Tenant-1d733861/b14b18a0-ebb8-11ea-9b5a-0a8a148431ae");
         String json = Utils.toJson(onboarding);
-        //System.out.println(json);
+        // System.out.println(json);
     }
 
     @Test
@@ -150,9 +157,9 @@ public class OnboardingServiceTest {
         String domainName = "saas-example.com";
         String subdomain = "tenant2";
         String existingSubdomain = "tenant2.saas-example.com.";
-        //System.out.println(existingSubdomain.substring(existingSubdomain.indexOf(domainName)));
+        // System.out.println(existingSubdomain.substring(existingSubdomain.indexOf(domainName)));
         existingSubdomain = existingSubdomain.substring(0, existingSubdomain.indexOf(domainName) - 1);
-        //System.out.println(existingSubdomain);
+        // System.out.println(existingSubdomain);
         assertTrue("Subdomain Exists", subdomain.equalsIgnoreCase(existingSubdomain));
     }
 }

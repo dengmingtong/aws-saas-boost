@@ -50,11 +50,13 @@ public class SaaSBoostArtifactsBucket {
     }
 
     /**
-     * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html">S3 Documentation</a>
+     * @see <a href=
+     *      "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-bucket-intro.html">S3
+     *      Documentation</a>
      * @return the S3 URL the Bucket object represents
      */
     public String getBucketUrl() {
-        return String.format("https://%s.s3.%s.amazonaws.com/", bucketName, region);
+        return String.format("https://%s.s3.%s.amazonaws.com.cn/", bucketName, region);
     }
 
     public void putFile(S3Client s3, Path localPath, Path remotePath) {
@@ -63,8 +65,7 @@ public class SaaSBoostArtifactsBucket {
             s3.putObject(PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(remotePath.toString())
-                    .build(), RequestBody.fromFile(localPath)
-            );
+                    .build(), RequestBody.fromFile(localPath));
         } catch (SdkServiceException s3Error) {
             LOGGER.error("s3:PutObject error {}", s3Error.getMessage());
             LOGGER.error(getFullStackTrace(s3Error));
@@ -74,7 +75,7 @@ public class SaaSBoostArtifactsBucket {
 
     protected static SaaSBoostArtifactsBucket createS3ArtifactBucket(S3Client s3, String envName, Region awsRegion) {
         UUID uniqueId = UUID.randomUUID();
-        String[] parts = uniqueId.toString().split("-");  //UUID 29219402-d9e2-4727-afec-2cd61f54fa8f
+        String[] parts = uniqueId.toString().split("-"); // UUID 29219402-d9e2-4727-afec-2cd61f54fa8f
 
         String s3ArtifactBucketName = "sb-" + envName + "-artifacts-" + parts[0] + "-" + parts[1];
         LOGGER.info("Creating S3 Artifact Bucket {}", s3ArtifactBucketName);
@@ -83,8 +84,8 @@ public class SaaSBoostArtifactsBucket {
             // LocationConstraint is not valid in US_EAST_1
             // https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/BucketLocationConstraint.html
             if (!(awsRegion.equals(Region.AWS_GLOBAL) || awsRegion.equals(Region.US_EAST_1))) {
-                createBucketRequestBuilder.createBucketConfiguration(config ->
-                        config.locationConstraint(BucketLocationConstraint.fromValue(awsRegion.id())));
+                createBucketRequestBuilder.createBucketConfiguration(
+                        config -> config.locationConstraint(BucketLocationConstraint.fromValue(awsRegion.id())));
             }
             createBucketRequestBuilder.bucket(s3ArtifactBucketName);
             s3.createBucket(createBucketRequestBuilder.build());
@@ -108,8 +109,8 @@ public class SaaSBoostArtifactsBucket {
                             + "            \"Principal\": \"*\",\n"
                             + "            \"Action\": \"s3:*\",\n"
                             + "            \"Resource\": [\n"
-                            + "                \"arn:aws:s3:::" + s3ArtifactBucketName + "/*\",\n"
-                            + "                \"arn:aws:s3:::" + s3ArtifactBucketName + "\"\n"
+                            + "                \"arn:aws-cn:s3:::" + s3ArtifactBucketName + "/*\",\n"
+                            + "                \"arn:aws-cn:s3:::" + s3ArtifactBucketName + "\"\n"
                             + "            ],\n"
                             + "            \"Condition\": {\n"
                             + "                \"Bool\": {\n"

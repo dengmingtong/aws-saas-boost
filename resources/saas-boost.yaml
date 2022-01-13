@@ -114,8 +114,8 @@ Resources:
             Action: s3:*
             Principal: '*'
             Resource:
-              - !Sub arn:aws:s3:::${LoggingBucket}/*
-              - !Sub arn:aws:s3:::${LoggingBucket}
+              - !Sub arn:aws-cn:s3:::${LoggingBucket}/*
+              - !Sub arn:aws-cn:s3:::${LoggingBucket}
             Condition:
               Bool: { 'aws:SecureTransport': false }
 
@@ -151,8 +151,8 @@ Resources:
             Action: s3:*
             Principal: '*'
             Resource:
-              - !Sub arn:aws:s3:::${CodePipelineBucket}/*
-              - !Sub arn:aws:s3:::${CodePipelineBucket}
+              - !Sub arn:aws-cn:s3:::${CodePipelineBucket}/*
+              - !Sub arn:aws-cn:s3:::${CodePipelineBucket}
             Condition:
               Bool: { 'aws:SecureTransport': false }
 
@@ -223,8 +223,8 @@ Resources:
             Action: s3:*
             Principal: '*'
             Resource:
-              - !Sub arn:aws:s3:::${AthenaOutput}/*
-              - !Sub arn:aws:s3:::${AthenaOutput}
+              - !Sub arn:aws-cn:s3:::${AthenaOutput}/*
+              - !Sub arn:aws-cn:s3:::${AthenaOutput}
             Condition:
               Bool: { 'aws:SecureTransport': false }
   # Bucket to host the admin console web application
@@ -292,34 +292,34 @@ Resources:
               - Effect: Allow
                 Action:
                   - logs:PutLogEvents
-                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
+                Resource: !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*:log-stream:*
               - Effect: Allow
                 Action:
                   - logs:CreateLogStream
                   - logs:DescribeLogStreams
                 Resource:
-                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+                  - !Sub arn:aws-cn:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
               - Effect: Allow
                 Action:
                   - s3:ListBucket
                   - s3:ListBucketVersions
                   - s3:GetBucketVersioning
                 Resource:
-                  - !Sub arn:aws:s3:::${WebS3Bucket}
-                  - !Sub arn:aws:s3:::${CodePipelineBucket}
-                  - !Sub arn:aws:s3:::${AthenaOutput}
-                  - !Sub arn:aws:s3:::${ALBAccessLogs}
-                  - !Sub arn:aws:s3:::${LoggingBucket}
+                  - !Sub arn:aws-cn:s3:::${WebS3Bucket}
+                  - !Sub arn:aws-cn:s3:::${CodePipelineBucket}
+                  - !Sub arn:aws-cn:s3:::${AthenaOutput}
+                  - !Sub arn:aws-cn:s3:::${ALBAccessLogs}
+                  - !Sub arn:aws-cn:s3:::${LoggingBucket}
               - Effect: Allow
                 Action:
                   - s3:DeleteObject
                   - s3:DeleteObjectVersion
                 Resource:
-                  - !Sub arn:aws:s3:::${WebS3Bucket}/*
-                  - !Sub arn:aws:s3:::${CodePipelineBucket}/*
-                  - !Sub arn:aws:s3:::${AthenaOutput}/*
-                  - !Sub arn:aws:s3:::${ALBAccessLogs}/*
-                  - !Sub arn:aws:s3:::${LoggingBucket}/*
+                  - !Sub arn:aws-cn:s3:::${WebS3Bucket}/*
+                  - !Sub arn:aws-cn:s3:::${CodePipelineBucket}/*
+                  - !Sub arn:aws-cn:s3:::${AthenaOutput}/*
+                  - !Sub arn:aws-cn:s3:::${ALBAccessLogs}/*
+                  - !Sub arn:aws-cn:s3:::${LoggingBucket}/*
   ClearBucketLogs:
     Type: AWS::Logs::LogGroup
     # For testing
@@ -395,7 +395,7 @@ Resources:
   network:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-network.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-network.yaml
       Parameters:
         SaaSBoostBucket: !Ref SaaSBoostBucket
         LambdaSourceFolder: !Ref LambdaSourceFolder
@@ -405,7 +405,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Condition: ProvisionManagedAD
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-managed-ad.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-managed-ad.yaml
       Parameters:
         Environment: !Ref Environment
         Subnets:
@@ -419,7 +419,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: network
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-web.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-web.yaml
       Parameters:
         Environment: !Ref Environment
         AdminEmailAddress: !Ref AdminEmailAddress
@@ -430,7 +430,7 @@ Resources:
       - network
       - InvokeClearLoggingBucket
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-core.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-core.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
@@ -444,7 +444,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: core
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-svc-billing.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-svc-billing.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
@@ -456,7 +456,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: core
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-metering-billing.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-metering-billing.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
@@ -470,7 +470,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: core
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-svc-metrics.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-svc-metrics.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
@@ -487,7 +487,7 @@ Resources:
       - core
       - tenant
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-svc-onboarding.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-svc-onboarding.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
@@ -503,7 +503,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: core
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-svc-quota.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-svc-quota.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
@@ -516,7 +516,7 @@ Resources:
       - core
       - web
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-svc-settings.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-svc-settings.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
@@ -531,7 +531,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: core
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-svc-tenant.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-svc-tenant.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
@@ -545,13 +545,13 @@ Resources:
       - core
       - web
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-svc-user.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-svc-user.yaml
       Parameters:
         Environment: !Ref Environment
         SaaSBoostBucket: !Ref SaaSBoostBucket
         LambdaSourceFolder: !Ref LambdaSourceFolder
         SaaSBoostUtilsLayer: !Ref SaaSBoostUtilsLayer
-        CognitoUserPoolId: !GetAtt web.Outputs.SBUserPool
+        # CognitoUserPoolId: !GetAtt web.Outputs.SBUserPool
   publicapi:
     Type: AWS::CloudFormation::Stack
     DependsOn:
@@ -564,13 +564,13 @@ Resources:
       - tenant
       - user
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-public-api.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-public-api.yaml
       Parameters:
         Environment: !Ref Environment
         PublicApi: !GetAtt core.Outputs.SaaSBoostPublicApi
         RootResourceId: !GetAtt core.Outputs.SaaSBoostPublicApiRootResourceId
         PublicApiStage: !Ref PublicApiStage
-        CognitoUserPoolId: !GetAtt web.Outputs.SBUserPool
+        # CognitoUserPoolId: !GetAtt web.Outputs.SBUserPool
         BillingServiceGetPlans: !GetAtt billing.Outputs.BillingServiceGetPlansArn
         MetricsServiceQuery: !GetAtt metrics.Outputs.QueryArn
         MetricsServiceDatasets: !GetAtt metrics.Outputs.DatasetsArn
@@ -611,7 +611,7 @@ Resources:
       - settings
       - tenant
     Properties:
-      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.amazonaws.com/saas-boost-private-api.yaml
+      TemplateURL: !Sub https://${SaaSBoostBucket}.s3.cn-north-1.amazonaws.com.cn/saas-boost-private-api.yaml
       Parameters:
         Environment: !Ref Environment
         PrivateApi: !GetAtt core.Outputs.SaaSBoostPrivateApi

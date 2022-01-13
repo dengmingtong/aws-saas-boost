@@ -46,13 +46,15 @@ import java.util.concurrent.*;
 public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object> {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RdsBootstrap.class);
-    private final static Region AWS_REGION = Region.of(System.getenv(SdkSystemSetting.AWS_REGION.environmentVariable()));
+    private final static Region AWS_REGION = Region
+            .of(System.getenv(SdkSystemSetting.AWS_REGION.environmentVariable()));
     private S3Client s3;
     private SsmClient ssm;
 
     public RdsBootstrap() throws URISyntaxException {
         try {
-            LOGGER.info("Version Info: " + getVersionInfo());;
+            LOGGER.info("Version Info: " + getVersionInfo());
+            ;
         } catch (Exception e) {
             LOGGER.error("Error getting version number", e);
             LOGGER.error(getFullStackTrace(e));
@@ -61,14 +63,14 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
                 .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
                 .region(AWS_REGION)
                 .httpClientBuilder(UrlConnectionHttpClient.builder())
-                .endpointOverride(new URI("https://s3." + AWS_REGION.id() + ".amazonaws.com"))
+                .endpointOverride(new URI("https://s3." + AWS_REGION.id() + ".amazonaws.com.cn"))
                 .overrideConfiguration(ClientOverrideConfiguration.builder().build())
                 .build();
         this.ssm = SsmClient.builder()
                 .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
                 .region(AWS_REGION)
                 .httpClientBuilder(UrlConnectionHttpClient.builder())
-                .endpointOverride(new URI("https://ssm." + AWS_REGION.id() + ".amazonaws.com"))
+                .endpointOverride(new URI("https://ssm." + AWS_REGION.id() + ".amazonaws.com.cn"))
                 .overrideConfiguration(ClientOverrideConfiguration.builder().build())
                 .build();
     }
@@ -105,7 +107,8 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
                     LOGGER.info("Getting database password secret from Parameter Store");
                     String password = null;
                     try {
-                        password = ssm.getParameter(request -> request.withDecryption(true).name(passwordParam)).parameter().value();
+                        password = ssm.getParameter(request -> request.withDecryption(true).name(passwordParam))
+                                .parameter().value();
                     } catch (SdkServiceException ssmError) {
                         LOGGER.error("ssm:GetParameter error", ssmError.getMessage());
                         throw ssmError;
@@ -114,10 +117,12 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
                         throw new RuntimeException("Password is null");
                     }
 
-                    // We need a connection that doesn't specify the database name since we may be creating it right now
+                    // We need a connection that doesn't specify the database name since we may be
+                    // creating it right now
                     String dbCheck = null;
 
-                    // Unlike MySQL/MariaDB, you have to specify a database name to get a connection to postgres...
+                    // Unlike MySQL/MariaDB, you have to specify a database name to get a connection
+                    // to postgres...
                     // And you should connect to dbo.master in SQL Server to check for a database
                     if (type.equals("postgresql")) {
                         dbCheck = "template1";
@@ -129,7 +134,8 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
                     // for SQL Server because RDS/CloudFormation won't create a
                     // database when you bring up an instance.
                     LOGGER.info("Checking if database {} exists", database);
-                    try (Connection dbCheckConn = DriverManager.getConnection(jdbcUrl(type, driverClassName, host, port, dbCheck), username, password)) {
+                    try (Connection dbCheckConn = DriverManager
+                            .getConnection(jdbcUrl(type, driverClassName, host, port, dbCheck), username, password)) {
                         String engine = dbCheckConn.getMetaData().getDatabaseProductName().toLowerCase();
                         if (!databaseExists(dbCheckConn, engine, database)) {
                             createdb(dbCheckConn, engine, database);
@@ -147,17 +153,18 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
                         try {
                             ResponseBytes<GetObjectResponse> responseBytes = s3.getObjectAsBytes(request -> request
                                     .bucket(bootstrapFileBucket)
-                                    .key(bootstrapFileKey)
-                            );
+                                    .key(bootstrapFileKey));
                             bootstrapSQL = responseBytes.asInputStream();
                         } catch (SdkServiceException s3Error) {
                             LOGGER.error("s3:GetObject error", s3Error.getMessage());
                             throw s3Error;
                         }
-                        // We have a database. Execute the SQL commands in the bootstrap file stored in S3.
+                        // We have a database. Execute the SQL commands in the bootstrap file stored in
+                        // S3.
                         LOGGER.info("Executing bootstrap SQL");
-                        try (Connection conn = DriverManager.getConnection(jdbcUrl(type, driverClassName, host, port, database), username, password);
-                             Statement sql = conn.createStatement()) {
+                        try (Connection conn = DriverManager.getConnection(
+                                jdbcUrl(type, driverClassName, host, port, database), username, password);
+                                Statement sql = conn.createStatement()) {
                             conn.setAutoCommit(false);
                             Scanner sqlScanner = new Scanner(bootstrapSQL, "UTF-8");
                             sqlScanner.useDelimiter(";");
@@ -165,7 +172,7 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
                             while (sqlScanner.hasNext()) {
                                 String ddl = sqlScanner.next().trim();
                                 if (!ddl.isEmpty()) {
-                                    //LOGGER.info(String.format("%02d %s", ++batch, ddl));
+                                    // LOGGER.info(String.format("%02d %s", ++batch, ddl));
                                     sql.addBatch(ddl);
                                 }
                             }
@@ -232,7 +239,7 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
                 try {
                     inputStream.close();
                 } catch (Exception e) {
-                    //LOGGER.error("getVersionInfo: Error closing inputStream");
+                    // LOGGER.error("getVersionInfo: Error closing inputStream");
                 }
             }
         }
@@ -248,7 +255,8 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
      * @param responseData
      * @return
      */
-    public final Object sendResponse(final Map<String, Object> event, final Context context, final String responseStatus, ObjectNode responseData) {
+    public final Object sendResponse(final Map<String, Object> event, final Context context,
+            final String responseStatus, ObjectNode responseData) {
         String responseUrl = (String) event.get("ResponseURL");
         LOGGER.info("ResponseURL: " + responseUrl + "\n");
 
@@ -294,8 +302,10 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
         boolean databaseExists = false;
         ResultSet rs = null;
         if (engine.equals("postgresql")) {
-            // Postgres doesn't support multiple databases (catalogs) per connection, so we can't use the JDBC
-            // metadata to get a list of all the databases on the host like you can with MySQL/MariaDB
+            // Postgres doesn't support multiple databases (catalogs) per connection, so we
+            // can't use the JDBC
+            // metadata to get a list of all the databases on the host like you can with
+            // MySQL/MariaDB
             Statement sql = conn.createStatement();
             rs = sql.executeQuery("SELECT datname AS TABLE_CAT FROM pg_database WHERE datistemplate = false");
         } else {
@@ -322,8 +332,7 @@ public class RdsBootstrap implements RequestHandler<Map<String, Object>, Object>
                 create.executeUpdate("IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '" + database + "')\n" +
                         "BEGIN\n" +
                         "CREATE DATABASE " + database + "\n" +
-                        "END"
-                );
+                        "END");
             } else if (engine.indexOf("mysql") != -1 || engine.indexOf("mariadb") != -1) {
                 create.executeUpdate("CREATE DATABASE IF NOT EXISTS " + database);
             }

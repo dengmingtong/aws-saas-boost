@@ -72,7 +72,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
     private static final String API_GATEWAY_STAGE = System.getenv("API_GATEWAY_STAGE");
     private static final String API_TRUST_ROLE = System.getenv("API_TRUST_ROLE");
     private static final String SAAS_BOOST_BUCKET = System.getenv("SAAS_BOOST_BUCKET");
-//    private static final String CLOUDFRONT_DISTRIBUTION = System.getenv("CLOUDFRONT_DISTRIBUTION");
+    // private static final String CLOUDFRONT_DISTRIBUTION =
+    // System.getenv("CLOUDFRONT_DISTRIBUTION");
     private final CloudFormationClient cfn;
     private final SfnClient snf;
     private final EventBridgeClient eventBridge;
@@ -96,7 +97,12 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
             this.presigner = S3Presigner.builder()
                     .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
                     .region(Region.of(AWS_REGION))
-                    .endpointOverride(new URI("https://" + s3.serviceName() + "." + Region.of(AWS_REGION) + ".amazonaws.com")) // will break in China regions
+                    .endpointOverride(
+                            new URI("https://" + s3.serviceName() + "." + Region.of(AWS_REGION) + ".amazonaws.com.cn")) // will
+                                                                                                                        // break
+                                                                                                                        // in
+                                                                                                                        // China
+                                                                                                                        // regions
                     .build();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -108,20 +114,20 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
     @Override
     public APIGatewayProxyResponseEvent handleRequest(Map<String, Object> event, Context context) {
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
     }
 
     public APIGatewayProxyResponseEvent getOnboarding(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         long startTimeMillis = System.currentTimeMillis();
         LOGGER.info("OnboardingService::getOnboarding");
 
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
         Map<String, String> params = (Map) event.get("pathParameters");
         String onboardingId = params.get("id");
@@ -142,20 +148,20 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
     public APIGatewayProxyResponseEvent getOnboardings(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
         long startTimeMillis = System.currentTimeMillis();
         LOGGER.info("OnboardingService::getOnboardings");
 
-        //Utils.logRequestEvent(event);
+        // Utils.logRequestEvent(event);
         APIGatewayProxyResponseEvent response = null;
         List<Onboarding> onboardings = dal.getOnboardings();
-            response = new APIGatewayProxyResponseEvent()
-                    .withHeaders(CORS)
-                    .withStatusCode(200)
-                    .withBody(Utils.toJson(onboardings));
+        response = new APIGatewayProxyResponseEvent()
+                .withHeaders(CORS)
+                .withStatusCode(200)
+                .withBody(Utils.toJson(onboardings));
 
         long totalTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("OnboardingService::getOnboardings exec " + totalTimeMillis);
@@ -165,7 +171,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
     public APIGatewayProxyResponseEvent startOnboarding(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
         if (Utils.isBlank(ONBOARDING_WORKFLOW)) {
@@ -181,10 +187,12 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
         Utils.logRequestEvent(event);
 
-        // Check to see if there are any images in the ECR repo before allowing onboarding
+        // Check to see if there are any images in the ECR repo before allowing
+        // onboarding
         try {
             ListImagesResponse dockerImages = ecr.listImages(request -> request.repositoryName(ECR_REPO));
-            //ListImagesResponse::hasImageIds will return true if the imageIds object is not null
+            // ListImagesResponse::hasImageIds will return true if the imageIds object is
+            // not null
             if (!dockerImages.hasImageIds() || dockerImages.imageIds().isEmpty()) {
                 return new APIGatewayProxyResponseEvent()
                         .withStatusCode(400)
@@ -222,11 +230,14 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                     .resource("settings?setting=HOSTED_ZONE&setting=DOMAIN_NAME")
                     .method("GET")
                     .build();
-            SdkHttpFullRequest getSettingsApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE, getSettingsRequest);
+            SdkHttpFullRequest getSettingsApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST,
+                    API_GATEWAY_STAGE, getSettingsRequest);
             LOGGER.info("Fetching SaaS Boost hosted zone id from Settings Service");
             try {
-                String getSettingsResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(getSettingsApiRequest, API_TRUST_ROLE, context.getAwsRequestId());
-                ArrayList<Map<String, String>> getSettingsResponse = Utils.fromJson(getSettingsResponseBody, ArrayList.class);
+                String getSettingsResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(getSettingsApiRequest,
+                        API_TRUST_ROLE, context.getAwsRequestId());
+                ArrayList<Map<String, String>> getSettingsResponse = Utils.fromJson(getSettingsResponseBody,
+                        ArrayList.class);
                 if (null == getSettingsResponse) {
                     return new APIGatewayProxyResponseEvent()
                             .withStatusCode(400)
@@ -236,25 +247,28 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 settings = getSettingsResponse
                         .stream()
                         .collect(Collectors.toMap(
-                                setting -> setting.get("name"), setting -> setting.get("value")
-                        ));
+                                setting -> setting.get("name"), setting -> setting.get("value")));
                 String hostedZoneId = settings.get("HOSTED_ZONE");
                 String domainName = settings.get("DOMAIN_NAME");
 
                 // Ask Route53 for all the records of this hosted zone
-                ListResourceRecordSetsResponse recordSets = route53.listResourceRecordSets(request -> request.hostedZoneId(hostedZoneId));
+                ListResourceRecordSetsResponse recordSets = route53
+                        .listResourceRecordSets(request -> request.hostedZoneId(hostedZoneId));
                 if (recordSets.hasResourceRecordSets()) {
                     for (ResourceRecordSet recordSet : recordSets.resourceRecordSets()) {
                         if (RRType.A == recordSet.type()) {
                             // Hosted Zone alias for the tenant subdomain
                             String recordSetName = recordSet.name();
-                            String existingSubdomain = recordSetName.substring(0, recordSetName.indexOf(domainName) - 1);
-                            LOGGER.info("Existing tenant subdomain " + existingSubdomain + " for record set " + recordSetName);
+                            String existingSubdomain = recordSetName.substring(0,
+                                    recordSetName.indexOf(domainName) - 1);
+                            LOGGER.info("Existing tenant subdomain " + existingSubdomain + " for record set "
+                                    + recordSetName);
                             if (subdomain.equalsIgnoreCase(existingSubdomain)) {
                                 return new APIGatewayProxyResponseEvent()
                                         .withStatusCode(400)
                                         .withHeaders(CORS)
-                                        .withBody("{\"message\": \"Tenant subdomain " + subdomain + " is already in use.\"}");
+                                        .withBody("{\"message\": \"Tenant subdomain " + subdomain
+                                                + " is already in use.\"}");
                             }
                         }
                     }
@@ -289,18 +303,20 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
             }
         }
 
-        Boolean overrideDefaults = (computeSize != null || memory != null || cpu != null || minCount != null || maxCount != null);
+        Boolean overrideDefaults = (computeSize != null || memory != null || cpu != null || minCount != null
+                || maxCount != null);
         if (overrideDefaults) {
             if (!validateTenantOverrides(computeSize, memory, cpu, minCount, maxCount)) {
                 LOGGER.error("Invalid default overrides. Both compute sizing and min and max counts must be set");
                 return new APIGatewayProxyResponseEvent()
                         .withStatusCode(400)
                         .withHeaders(CORS)
-                        .withBody("{\"message\":\"Invalid default overrides. Both compute sizing and min and max counts must be set.\"}");
+                        .withBody(
+                                "{\"message\":\"Invalid default overrides. Both compute sizing and min and max counts must be set.\"}");
             }
         }
 
-        //check if Quotas will be exceeded.
+        // check if Quotas will be exceeded.
         try {
             LOGGER.info("Check Service Quota Limits");
             Map<String, Object> retMap = checkLimits();
@@ -318,14 +334,15 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
             throw new RuntimeException("Error checking Service Quotas with Private API quotas/check");
         }
 
-        //*TODO:  We should add check for CIDRs here!
+        // *TODO: We should add check for CIDRs here!
 
         UUID onboardingId = UUID.randomUUID();
         Onboarding onboarding = new Onboarding(onboardingId, OnboardingStatus.created);
         onboarding.setTenantName((String) requestBody.get("name"));
         onboarding = dal.insertOnboarding(onboarding);
 
-        // Collect up the input we need to send to the tenant service via our Step Functions workflow
+        // Collect up the input we need to send to the tenant service via our Step
+        // Functions workflow
         Map<String, Object> tenant = new HashMap<>();
         tenant.put("active", true);
         tenant.put("onboardingStatus", onboarding.getStatus().toString());
@@ -350,7 +367,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
             tenant.put("planId", planId);
         }
 
-        //generate a pre-signed url to upload  the zip file
+        // generate a pre-signed url to upload the zip file
         String key = "temp/" + onboarding.getId().toString() + ".zip";
         final Duration expires = Duration.ofMinutes(15); // UI times out in 10 min
 
@@ -360,10 +377,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 .putObjectRequest(PutObjectRequest.builder()
                         .bucket(SAAS_BOOST_BUCKET)
                         .key(key)
-                        .build()
-                )
-                .build()
-        );
+                        .build())
+                .build());
 
         onboarding.setZipFileUrl(presignedObject.url().toString());
 
@@ -380,8 +395,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                     .name(executionName)
                     .input(inputJson)
                     .stateMachineArn(ONBOARDING_WORKFLOW)
-                    .build()
-            );
+                    .build());
             LOGGER.info("OnboardingService::startOnboarding Step Functions responded with " + response.toString());
         } catch (SdkServiceException snfError) {
             LOGGER.error("OnboardingService::startOnboarding Step Functions error " + snfError.getMessage());
@@ -399,7 +413,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 .withBody(Utils.toJson(onboarding));
     }
 
-    protected static boolean validateTenantOverrides(ComputeSize computeSize, Integer memory, Integer cpu, Integer minCount, Integer maxCount) {
+    protected static boolean validateTenantOverrides(ComputeSize computeSize, Integer memory, Integer cpu,
+            Integer minCount, Integer maxCount) {
         boolean computeOverride = (computeSize != null || (memory != null && cpu != null));
         boolean invalidComputeOverride = (computeSize == null && (memory == null || cpu == null));
         boolean asgOverride = (minCount != null && maxCount != null);
@@ -427,7 +442,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
     public APIGatewayProxyResponseEvent updateStatus(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
 
@@ -466,7 +481,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
     public APIGatewayProxyResponseEvent provisionTenant(Map<String, Object> event, Context context) {
         if (Utils.warmup(event)) {
-            //LOGGER.info("Warming up");
+            // LOGGER.info("Warming up");
             return new APIGatewayProxyResponseEvent().withHeaders(CORS).withStatusCode(200);
         }
         if (Utils.isBlank(SAAS_BOOST_ENV)) {
@@ -506,16 +521,20 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
             }
             UUID tenantId = UUID.fromString(((String) tenant.get("id")).toLowerCase());
 
-            // Get the settings for this SaaS Boost install for this SaaS Boost "environment"
+            // Get the settings for this SaaS Boost install for this SaaS Boost
+            // "environment"
             Map<String, String> settings = null;
             ApiRequest getSettingsRequest = ApiRequest.builder()
                     .resource("settings")
                     .method("GET")
                     .build();
-            SdkHttpFullRequest getSettingsApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE, getSettingsRequest);
+            SdkHttpFullRequest getSettingsApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST,
+                    API_GATEWAY_STAGE, getSettingsRequest);
             try {
-                String getSettingsResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(getSettingsApiRequest, API_TRUST_ROLE, context.getAwsRequestId());
-                ArrayList<Map<String, String>> getSettingsResponse = Utils.fromJson(getSettingsResponseBody, ArrayList.class);
+                String getSettingsResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(getSettingsApiRequest,
+                        API_TRUST_ROLE, context.getAwsRequestId());
+                ArrayList<Map<String, String>> getSettingsResponse = Utils.fromJson(getSettingsResponseBody,
+                        ArrayList.class);
                 if (null == getSettingsResponse) {
                     return new APIGatewayProxyResponseEvent()
                             .withStatusCode(400)
@@ -525,8 +544,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 settings = getSettingsResponse
                         .stream()
                         .collect(Collectors.toMap(
-                                setting -> setting.get("name"), setting -> setting.get("value")
-                        ));
+                                setting -> setting.get("name"), setting -> setting.get("value")));
             } catch (Exception e) {
                 LOGGER.error("Error invoking API settings");
                 dal.updateStatus(onboardingId, OnboardingStatus.failed);
@@ -613,7 +631,6 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
             String fsxWeeklyMaintenanceTime = "";
             String fsxWindowsMountDrive = "";
 
-
             if (null != fileSystemType && !fileSystemType.isEmpty()) {
                 mountPoint = settings.get("FILE_SYSTEM_MOUNT_POINT");
                 if ("FSX".equals(fileSystemType)) {
@@ -636,7 +653,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                             fsxThroughputMbs = ((Integer) tenant.get("fsxThroughputMbs")).toString();
                             LOGGER.info("Override default FSX Throughput with {}", fsxThroughputMbs);
                         } catch (NumberFormatException nfe) {
-                            LOGGER.error("Can't parse tenant task FSX Throughput from {}", tenant.get("fsxThroughputMbs"));
+                            LOGGER.error("Can't parse tenant task FSX Throughput from {}",
+                                    tenant.get("fsxThroughputMbs"));
                             dal.updateStatus(onboardingId, OnboardingStatus.failed);
                             LOGGER.error(Utils.getFullStackTrace(nfe));
                         }
@@ -648,28 +666,30 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                             fsxBackupRetentionDays = ((Integer) tenant.get("fsxBackupRetentionDays")).toString();
                             LOGGER.info("Override default FSX Throughput with {}", fsxBackupRetentionDays);
                         } catch (NumberFormatException nfe) {
-                            LOGGER.error("Can't parse tenant task FSX Throughput from {}", tenant.get("fsxBackupRetentionDays"));
+                            LOGGER.error("Can't parse tenant task FSX Throughput from {}",
+                                    tenant.get("fsxBackupRetentionDays"));
                             dal.updateStatus(onboardingId, OnboardingStatus.failed);
                             LOGGER.error(Utils.getFullStackTrace(nfe));
                         }
                     }
 
-                    fsxDailyBackupTime = settings.get("FSX_DAILY_BACKUP_TIME"); //HH:MM in UTC
+                    fsxDailyBackupTime = settings.get("FSX_DAILY_BACKUP_TIME"); // HH:MM in UTC
                     if (tenant.get("fsxDailyBackupTime") != null) {
                         fsxDailyBackupTime = (String) tenant.get("fsxDailyBackupTime");
-                            LOGGER.info("Override default FSX Daily Backup time with {}", fsxDailyBackupTime);
+                        LOGGER.info("Override default FSX Daily Backup time with {}", fsxDailyBackupTime);
                     }
 
-                    fsxWeeklyMaintenanceTime = settings.get("FSX_WEEKLY_MAINTENANCE_TIME");//d:HH:MM in UTC
+                    fsxWeeklyMaintenanceTime = settings.get("FSX_WEEKLY_MAINTENANCE_TIME");// d:HH:MM in UTC
                     if (tenant.get("fsxWeeklyMaintenanceTime") != null) {
                         fsxWeeklyMaintenanceTime = (String) tenant.get("fsxWeeklyMaintenanceTime");
                         LOGGER.info("Override default FSX Weekly Maintenance time with {}", fsxWeeklyMaintenanceTime);
                     }
 
                     fsxWindowsMountDrive = settings.get("FSX_WINDOWS_MOUNT_DRIVE");
-                    //Note:  Do not want to override the FSX_WINDOWS_MOUNT_DRIVE as that should be same for all tenants
+                    // Note: Do not want to override the FSX_WINDOWS_MOUNT_DRIVE as that should be
+                    // same for all tenants
 
-                } else { //this is for EFS file system
+                } else { // this is for EFS file system
                     enableEfs = true;
                     encryptFilesystem = Boolean.valueOf(settings.get("FILE_SYSTEM_ENCRYPT"));
                     filesystemLifecycle = settings.get("FILE_SYSTEM_LIFECYCLE");
@@ -698,15 +718,19 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 dbDatabase = settings.get("DB_NAME");
                 dbBootstrap = settings.get("DB_BOOTSTRAP_FILE");
 
-                // CloudFormation needs the Parameter Store reference key (version number) to properly
-                // decode secure string parameters... So we need to call the private API to get it.
+                // CloudFormation needs the Parameter Store reference key (version number) to
+                // properly
+                // decode secure string parameters... So we need to call the private API to get
+                // it.
                 ApiRequest paramStoreRef = ApiRequest.builder()
                         .resource("settings/DB_MASTER_PASSWORD/ref")
                         .method("GET")
                         .build();
-                SdkHttpFullRequest paramStoreRefApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE, paramStoreRef);
+                SdkHttpFullRequest paramStoreRefApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST,
+                        API_GATEWAY_STAGE, paramStoreRef);
                 try {
-                    String paramStoreRefResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(paramStoreRefApiRequest, API_TRUST_ROLE, context.getAwsRequestId());
+                    String paramStoreRefResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(
+                            paramStoreRefApiRequest, API_TRUST_ROLE, context.getAwsRequestId());
                     Map<String, String> dbPasswordRef = Utils.fromJson(paramStoreRefResponseBody, HashMap.class);
                     if (null == dbPasswordRef) {
                         return new APIGatewayProxyResponseEvent()
@@ -730,18 +754,22 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 billingPlan = "";
             }
 
-            // CloudFormation needs the Parameter Store reference key (version number) to properly
-            // decode secure string parameters... So we need to call the private API to get it.
-            String sslCertArn= settings.get("SSL_CERT_ARN");
+            // CloudFormation needs the Parameter Store reference key (version number) to
+            // properly
+            // decode secure string parameters... So we need to call the private API to get
+            // it.
+            String sslCertArn = settings.get("SSL_CERT_ARN");
             String sslCertArnRef = "";
             if (null != sslCertArn && !"".equals(sslCertArn)) {
                 ApiRequest paramStoreRef = ApiRequest.builder()
                         .resource("settings/SSL_CERT_ARN/ref")
                         .method("GET")
                         .build();
-                SdkHttpFullRequest paramStoreRefApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE, paramStoreRef);
+                SdkHttpFullRequest paramStoreRefApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST,
+                        API_GATEWAY_STAGE, paramStoreRef);
                 try {
-                    String paramStoreRefResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(paramStoreRefApiRequest, API_TRUST_ROLE, context.getAwsRequestId());
+                    String paramStoreRefResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(
+                            paramStoreRefApiRequest, API_TRUST_ROLE, context.getAwsRequestId());
                     Map<String, String> certRef = Utils.fromJson(paramStoreRefResponseBody, HashMap.class);
                     if (null == certRef) {
                         return new APIGatewayProxyResponseEvent()
@@ -758,63 +786,103 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 }
             }
 
-
-        // CloudFormation won't let you use dashes or underscores in Mapping second level key names
-            // And it won't let you use Fn::Join or Fn::Split in Fn::FindInMap... so we will mangle this
+            // CloudFormation won't let you use dashes or underscores in Mapping second
+            // level key names
+            // And it won't let you use Fn::Join or Fn::Split in Fn::FindInMap... so we will
+            // mangle this
             // parameter before we send it in.
             String clusterOS = settings.getOrDefault("CLUSTER_OS", "").replace("_", "");
 
             List<Parameter> templateParameters = new ArrayList<>();
-            templateParameters.add(Parameter.builder().parameterKey("TenantId").parameterValue(tenantId.toString()).build());
-            templateParameters.add(Parameter.builder().parameterKey("TenantSubDomain").parameterValue(tenantSubdomain).build());
-            templateParameters.add(Parameter.builder().parameterKey("Environment").parameterValue(SAAS_BOOST_ENV).build());
-            templateParameters.add(Parameter.builder().parameterKey("SaaSBoostBucket").parameterValue(settings.get("SAAS_BOOST_BUCKET")).build());
-            templateParameters.add(Parameter.builder().parameterKey("LambdaSourceFolder").parameterValue(settings.get("SAAS_BOOST_LAMBDAS_FOLDER")).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("TenantId").parameterValue(tenantId.toString()).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("TenantSubDomain").parameterValue(tenantSubdomain).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("Environment").parameterValue(SAAS_BOOST_ENV).build());
+            templateParameters.add(Parameter.builder().parameterKey("SaaSBoostBucket")
+                    .parameterValue(settings.get("SAAS_BOOST_BUCKET")).build());
+            templateParameters.add(Parameter.builder().parameterKey("LambdaSourceFolder")
+                    .parameterValue(settings.get("SAAS_BOOST_LAMBDAS_FOLDER")).build());
             templateParameters.add(Parameter.builder().parameterKey("DockerHostOS").parameterValue(clusterOS).build());
-            templateParameters.add(Parameter.builder().parameterKey("DockerHostInstanceType").parameterValue(settings.get("CLUSTER_INSTANCE_TYPE")).build());
+            templateParameters.add(Parameter.builder().parameterKey("DockerHostInstanceType")
+                    .parameterValue(settings.get("CLUSTER_INSTANCE_TYPE")).build());
             templateParameters.add(Parameter.builder().parameterKey("TaskMemory").parameterValue(taskMemory).build());
             templateParameters.add(Parameter.builder().parameterKey("TaskCPU").parameterValue(taskCpu).build());
             templateParameters.add(Parameter.builder().parameterKey("TaskCount").parameterValue(taskCount).build());
-            templateParameters.add(Parameter.builder().parameterKey("MaxTaskCount").parameterValue(maxTaskCount).build());
-            templateParameters.add(Parameter.builder().parameterKey("ContainerRepository").parameterValue(settings.get("ECR_REPO")).build());
-            templateParameters.add(Parameter.builder().parameterKey("ContainerPort").parameterValue(settings.get("CONTAINER_PORT")).build());
-            templateParameters.add(Parameter.builder().parameterKey("ContainerHealthCheckPath").parameterValue(settings.get("HEALTH_CHECK")).build());
-            templateParameters.add(Parameter.builder().parameterKey("CodePipelineRoleArn").parameterValue(settings.get("CODE_PIPELINE_ROLE")).build());
-            templateParameters.add(Parameter.builder().parameterKey("ArtifactBucket").parameterValue(settings.get("CODE_PIPELINE_BUCKET")).build());
-            templateParameters.add(Parameter.builder().parameterKey("TransitGateway").parameterValue(settings.get("TRANSIT_GATEWAY")).build());
-            templateParameters.add(Parameter.builder().parameterKey("TenantTransitGatewayRouteTable").parameterValue(settings.get("TRANSIT_GATEWAY_ROUTE_TABLE")).build());
-            templateParameters.add(Parameter.builder().parameterKey("EgressTransitGatewayRouteTable").parameterValue(settings.get("EGRESS_ROUTE_TABLE")).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("MaxTaskCount").parameterValue(maxTaskCount).build());
+            templateParameters.add(Parameter.builder().parameterKey("ContainerRepository")
+                    .parameterValue(settings.get("ECR_REPO")).build());
+            templateParameters.add(Parameter.builder().parameterKey("ContainerPort")
+                    .parameterValue(settings.get("CONTAINER_PORT")).build());
+            templateParameters.add(Parameter.builder().parameterKey("ContainerHealthCheckPath")
+                    .parameterValue(settings.get("HEALTH_CHECK")).build());
+            templateParameters.add(Parameter.builder().parameterKey("CodePipelineRoleArn")
+                    .parameterValue(settings.get("CODE_PIPELINE_ROLE")).build());
+            templateParameters.add(Parameter.builder().parameterKey("ArtifactBucket")
+                    .parameterValue(settings.get("CODE_PIPELINE_BUCKET")).build());
+            templateParameters.add(Parameter.builder().parameterKey("TransitGateway")
+                    .parameterValue(settings.get("TRANSIT_GATEWAY")).build());
+            templateParameters.add(Parameter.builder().parameterKey("TenantTransitGatewayRouteTable")
+                    .parameterValue(settings.get("TRANSIT_GATEWAY_ROUTE_TABLE")).build());
+            templateParameters.add(Parameter.builder().parameterKey("EgressTransitGatewayRouteTable")
+                    .parameterValue(settings.get("EGRESS_ROUTE_TABLE")).build());
             templateParameters.add(Parameter.builder().parameterKey("CidrPrefix").parameterValue(cidrPrefix).build());
-            templateParameters.add(Parameter.builder().parameterKey("DomainName").parameterValue(settings.get("DOMAIN_NAME")).build());
-            templateParameters.add(Parameter.builder().parameterKey("SSLCertArnParam").parameterValue(sslCertArnRef).build());
-            templateParameters.add(Parameter.builder().parameterKey("HostedZoneId").parameterValue(settings.get("HOSTED_ZONE")).build());
-            templateParameters.add(Parameter.builder().parameterKey("UseEFS").parameterValue(enableEfs.toString()).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("DomainName").parameterValue(settings.get("DOMAIN_NAME")).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("SSLCertArnParam").parameterValue(sslCertArnRef).build());
+            templateParameters.add(Parameter.builder().parameterKey("HostedZoneId")
+                    .parameterValue(settings.get("HOSTED_ZONE")).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("UseEFS").parameterValue(enableEfs.toString()).build());
             templateParameters.add(Parameter.builder().parameterKey("MountPoint").parameterValue(mountPoint).build());
-            templateParameters.add(Parameter.builder().parameterKey("EncryptEFS").parameterValue(encryptFilesystem.toString()).build());
-            templateParameters.add(Parameter.builder().parameterKey("EFSLifecyclePolicy").parameterValue(filesystemLifecycle).build());
+            templateParameters.add(Parameter.builder().parameterKey("EncryptEFS")
+                    .parameterValue(encryptFilesystem.toString()).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("EFSLifecyclePolicy").parameterValue(filesystemLifecycle).build());
 
-            //--> for FSX for Windows
-            templateParameters.add(Parameter.builder().parameterKey("UseFSx").parameterValue(enableFSx.toString()).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxWindowsMountDrive").parameterValue(fsxWindowsMountDrive).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxDailyBackupTime").parameterValue(fsxDailyBackupTime).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxBackupRetention").parameterValue(fsxBackupRetentionDays).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxThroughputCapacity").parameterValue(fsxThroughputMbs).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxStorageCapacity").parameterValue(fsxStorageGb).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxWeeklyMaintenanceTime").parameterValue(fsxWeeklyMaintenanceTime).build());
+            // --> for FSX for Windows
+            templateParameters
+                    .add(Parameter.builder().parameterKey("UseFSx").parameterValue(enableFSx.toString()).build());
+            templateParameters.add(Parameter.builder().parameterKey("FSxWindowsMountDrive")
+                    .parameterValue(fsxWindowsMountDrive).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("FSxDailyBackupTime").parameterValue(fsxDailyBackupTime).build());
+            templateParameters.add(Parameter.builder().parameterKey("FSxBackupRetention")
+                    .parameterValue(fsxBackupRetentionDays).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("FSxThroughputCapacity").parameterValue(fsxThroughputMbs).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("FSxStorageCapacity").parameterValue(fsxStorageGb).build());
+            templateParameters.add(Parameter.builder().parameterKey("FSxWeeklyMaintenanceTime")
+                    .parameterValue(fsxWeeklyMaintenanceTime).build());
             // <<-
-            templateParameters.add(Parameter.builder().parameterKey("UseRDS").parameterValue(enableDatabase.toString()).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSInstanceClass").parameterValue(dbInstanceClass).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("UseRDS").parameterValue(enableDatabase.toString()).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSInstanceClass").parameterValue(dbInstanceClass).build());
             templateParameters.add(Parameter.builder().parameterKey("RDSEngine").parameterValue(dbEngine).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSEngineVersion").parameterValue(dbVersion).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSParameterGroupFamily").parameterValue(dbFamily).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSMasterUsername").parameterValue(dbMasterUsername).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSMasterPasswordParam").parameterValue(dbMasterPasswordRef).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSEngineVersion").parameterValue(dbVersion).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSParameterGroupFamily").parameterValue(dbFamily).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("RDSMasterUsername").parameterValue(dbMasterUsername).build());
+            templateParameters.add(Parameter.builder().parameterKey("RDSMasterPasswordParam")
+                    .parameterValue(dbMasterPasswordRef).build());
             templateParameters.add(Parameter.builder().parameterKey("RDSPort").parameterValue(dbPort).build());
             templateParameters.add(Parameter.builder().parameterKey("RDSDatabase").parameterValue(dbDatabase).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSBootstrap").parameterValue(dbBootstrap).build());
-            templateParameters.add(Parameter.builder().parameterKey("MetricsStream").parameterValue(settings.get("METRICS_STREAM") != null ? settings.get("METRICS_STREAM") : "").build());
-            templateParameters.add(Parameter.builder().parameterKey("ALBAccessLogsBucket").parameterValue(settings.get("ALB_ACCESS_LOGS_BUCKET")).build());
-            templateParameters.add(Parameter.builder().parameterKey("EventBus").parameterValue(settings.get("EVENT_BUS")).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSBootstrap").parameterValue(dbBootstrap).build());
+            templateParameters.add(Parameter.builder().parameterKey("MetricsStream")
+                    .parameterValue(settings.get("METRICS_STREAM") != null ? settings.get("METRICS_STREAM") : "")
+                    .build());
+            templateParameters.add(Parameter.builder().parameterKey("ALBAccessLogsBucket")
+                    .parameterValue(settings.get("ALB_ACCESS_LOGS_BUCKET")).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("EventBus").parameterValue(settings.get("EVENT_BUS")).build());
             templateParameters.add(Parameter.builder().parameterKey("BillingPlan").parameterValue(billingPlan).build());
             for (Parameter p : templateParameters) {
                 if (p.parameterValue() == null) {
@@ -835,14 +903,17 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
             try {
                 CreateStackResponse cfnResponse = cfn.createStack(CreateStackRequest.builder()
                         .stackName(stackName)
-                        .onFailure("DO_NOTHING") // This was set to DO_NOTHING to ease debugging of failed stacks. Maybe not appropriate for "production". If we change this we'll have to add a whole bunch of IAM delete permissions to the execution role.
-                        //.timeoutInMinutes(60) // Some resources can take a really long time to light up. Do we want to specify this?
+                        .onFailure("DO_NOTHING") // This was set to DO_NOTHING to ease debugging of failed stacks. Maybe
+                                                 // not appropriate for "production". If we change this we'll have to
+                                                 // add a whole bunch of IAM delete permissions to the execution role.
+                        // .timeoutInMinutes(60) // Some resources can take a really long time to light
+                        // up. Do we want to specify this?
                         .capabilitiesWithStrings("CAPABILITY_NAMED_IAM")
                         .notificationARNs(settings.get("ONBOARDING_SNS"))
-                        .templateURL("https://" + settings.get("SAAS_BOOST_BUCKET") + ".s3.amazonaws.com/" + settings.get("ONBOARDING_TEMPLATE"))
+                        .templateURL("https://" + settings.get("SAAS_BOOST_BUCKET") + ".s3.cn-north-1.amazonaws.com.cn/"
+                                + settings.get("ONBOARDING_TEMPLATE"))
                         .parameters(templateParameters)
-                        .build()
-                );
+                        .build());
                 stackId = cfnResponse.stackId();
                 onboarding.setStatus(OnboardingStatus.provisioning);
                 onboarding.setStackId(stackId);
@@ -891,7 +962,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 Onboarding onboarding = dal.getOnboardingByTenantId(tenantId);
                 if (onboarding != null) {
                     tenantId = onboarding.getTenantId().toString();
-                    LOGGER.info("OnboardingService::statusEventListener Updating Onboarding status for tenant " + tenantId + " to " + status);
+                    LOGGER.info("OnboardingService::statusEventListener Updating Onboarding status for tenant "
+                            + tenantId + " to " + status);
                     onboarding = dal.updateStatus(onboarding.getId(), status);
                     response = new APIGatewayProxyResponseEvent()
                             .withStatusCode(200)
@@ -904,7 +976,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                             ObjectNode systemApiRequest = MAPPER.createObjectNode();
                             systemApiRequest.put("resource", "tenants/" + tenantId + "/onboarding");
                             systemApiRequest.put("method", "PUT");
-                            systemApiRequest.put("body", "{\"id\":\"" + tenantId + "\", \"onboardingStatus\":\"succeeded\"}");
+                            systemApiRequest.put("body",
+                                    "{\"id\":\"" + tenantId + "\", \"onboardingStatus\":\"succeeded\"}");
                             PutEventsRequestEntry systemApiCallEvent = PutEventsRequestEntry.builder()
                                     .eventBusName(SAAS_BOOST_EVENT_BUS)
                                     .detailType(SYSTEM_API_CALL_DETAIL_TYPE)
@@ -912,11 +985,11 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                                     .detail(MAPPER.writeValueAsString(systemApiRequest))
                                     .build();
                             PutEventsResponse eventBridgeResponse = eventBridge.putEvents(r -> r
-                                    .entries(systemApiCallEvent)
-                            );
+                                    .entries(systemApiCallEvent));
                             for (PutEventsResultEntry entry : eventBridgeResponse.entries()) {
                                 if (entry.eventId() != null && !entry.eventId().isEmpty()) {
-                                    LOGGER.info("Put event success {} {}", entry.toString(), systemApiCallEvent.toString());
+                                    LOGGER.info("Put event success {} {}", entry.toString(),
+                                            systemApiCallEvent.toString());
                                 } else {
                                     LOGGER.error("Put event failed {}", entry.toString());
                                 }
@@ -958,15 +1031,17 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
             Onboarding onboarding = dal.getOnboardingByTenantId(tenantId);
             if (onboarding != null) {
-                LOGGER.info("OnboardingService::statusEventListener Updating Onboarding status for tenant " + onboarding.getTenantId() + " to " + status);
+                LOGGER.info("OnboardingService::statusEventListener Updating Onboarding status for tenant "
+                        + onboarding.getTenantId() + " to " + status);
                 onboarding = dal.updateStatus(onboarding.getId(), status);
 
-                //update the Tenant record status
+                // update the Tenant record status
                 try {
                     ObjectNode systemApiRequest = MAPPER.createObjectNode();
                     systemApiRequest.put("resource", "tenants/" + tenantId + "/onboarding");
                     systemApiRequest.put("method", "PUT");
-                    systemApiRequest.put("body", "{\"id\":\"" + tenantId + "\", \"onboardingStatus\":\"" + status + "\"}");
+                    systemApiRequest.put("body",
+                            "{\"id\":\"" + tenantId + "\", \"onboardingStatus\":\"" + status + "\"}");
                     PutEventsRequestEntry systemApiCallEvent = PutEventsRequestEntry.builder()
                             .eventBusName(SAAS_BOOST_EVENT_BUS)
                             .detailType(SYSTEM_API_CALL_DETAIL_TYPE)
@@ -974,8 +1049,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                             .detail(MAPPER.writeValueAsString(systemApiRequest))
                             .build();
                     PutEventsResponse eventBridgeResponse = eventBridge.putEvents(r -> r
-                            .entries(systemApiCallEvent)
-                    );
+                            .entries(systemApiCallEvent));
                     for (PutEventsResultEntry entry : eventBridgeResponse.entries()) {
                         if (entry.eventId() != null && !entry.eventId().isEmpty()) {
                             LOGGER.info("Put event success {} {}", entry.toString(), systemApiCallEvent.toString());
@@ -985,7 +1059,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                     }
 
                     if (status.equals(OnboardingStatus.provisioned)) {
-                        //move the s3 file from the SAAS_BOOST_BUCKET to a key for the tenant and name it config.zip
+                        // move the s3 file from the SAAS_BOOST_BUCKET to a key for the tenant and name
+                        // it config.zip
                         moveTenantConfigFile(onboarding.getId().toString(), tenantId);
                     }
                 } catch (JsonProcessingException ioe) {
@@ -1018,10 +1093,10 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
     public Object deleteTenant(Map<String, Object> event, Context context) {
         /*
-        Handles a event message to delete a tenant
+         * Handles a event message to delete a tenant
          */
 
-        //*TODO - Add Lambda function and event rule for "Delete Tenant"
+        // *TODO - Add Lambda function and event rule for "Delete Tenant"
         long startTimeMillis = System.currentTimeMillis();
         LOGGER.info("OnboardingService::deleteTenant");
         Utils.logRequestEvent(event);
@@ -1030,11 +1105,12 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
         String tenantId = (String) detail.get("tenantId");
         Onboarding onboarding = dal.getOnboardingByTenantId(tenantId);
         if (onboarding != null) {
-            LOGGER.info("OnboardingService::deleteTenant Updating Onboarding status for tenant " + onboarding.getTenantId() + " to DELETING");
+            LOGGER.info("OnboardingService::deleteTenant Updating Onboarding status for tenant "
+                    + onboarding.getTenantId() + " to DELETING");
             dal.updateStatus(onboarding.getId(), OnboardingStatus.deleting);
         }
 
-        //Now lets delete the CloudFormation stack
+        // Now lets delete the CloudFormation stack
         String tenantStackId = "Tenant-" + tenantId.split("-")[0];
         try {
             cfn.deleteStack(DeleteStackRequest.builder().stackName(tenantStackId).build());
@@ -1050,6 +1126,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
         LOGGER.info("OnboardingService::deleteTenant exec " + totalTimeMillis);
         return null;
     }
+
     private void moveTenantConfigFile(String onboardingId, String tenantId) {
         if (Utils.isBlank(SAAS_BOOST_BUCKET)) {
             throw new IllegalStateException("Missing required environment variable SAAS_BOOST_BUCKET");
@@ -1058,14 +1135,14 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
         String sourceFile = "temp/" + onboardingId + ".zip";
         LOGGER.info("Start: Move tenant config zip file {} for tenant {}", sourceFile, tenantId);
 
-        //check if S3 file with name onboardingId.zip exists
+        // check if S3 file with name onboardingId.zip exists
         String encodedUrl = null;
 
         try {
             encodedUrl = URLEncoder.encode(SAAS_BOOST_BUCKET + "/" + sourceFile, StandardCharsets.UTF_8.toString());
         } catch (UnsupportedEncodingException e) {
-           LOGGER.error("URL could not be encoded: " + e.getMessage());
-           throw new RuntimeException("Unable to move tenant zip file " +  sourceFile);
+            LOGGER.error("URL could not be encoded: " + e.getMessage());
+            throw new RuntimeException("Unable to move tenant zip file " + sourceFile);
         }
 
         try {
@@ -1077,7 +1154,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
             ListObjectsResponse res = s3.listObjects(listObjects);
             if (res.contents().isEmpty()) {
-                //no file to copy
+                // no file to copy
                 LOGGER.info("No config zip file to copy for tenant {}", tenantId);
                 return;
             }
@@ -1089,7 +1166,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
         } catch (S3Exception e) {
             LOGGER.error("Error fetching config zip file {} ", sourceFile + " for tenant " + tenantId);
             LOGGER.error(Utils.getFullStackTrace(e));
-            throw new RuntimeException("Unable to copy config zip file " +  sourceFile + " for tenant " + tenantId);
+            throw new RuntimeException("Unable to copy config zip file " + sourceFile + " for tenant " + tenantId);
         }
         try {
             s3.copyObject(CopyObjectRequest.builder()
@@ -1101,10 +1178,10 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
         } catch (S3Exception e) {
             LOGGER.error("Error copying config zip file {} to {}", sourceFile, tenantId + "/config.zip");
             LOGGER.error(Utils.getFullStackTrace(e));
-            throw new RuntimeException("Unable to copy config zip file " +  sourceFile + " for tenant " + tenantId);
+            throw new RuntimeException("Unable to copy config zip file " + sourceFile + " for tenant " + tenantId);
         }
 
-        //delete the existing file
+        // delete the existing file
         try {
             s3.deleteObject(DeleteObjectRequest.builder()
                     .bucket(SAAS_BOOST_BUCKET)
@@ -1113,7 +1190,7 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
         } catch (S3Exception e) {
             LOGGER.error("Error deleting tenant zip file {}", sourceFile);
             LOGGER.error(Utils.getFullStackTrace(e));
-            throw new RuntimeException("Unable to delete tenant zip file " +  sourceFile + " for tenant " + tenantId);
+            throw new RuntimeException("Unable to delete tenant zip file " + sourceFile + " for tenant " + tenantId);
         }
 
         LOGGER.info("Completed: Move tenant config file {} for tenant {}", sourceFile, tenantId);
@@ -1136,7 +1213,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
 
         // Unlike when we initially provision a tenant and compare the "global" settings
         // to the potentially overriden per-tenant settings, here we're expecting to be
-        // told what to set the compute parameters to and assume the proceeding code that
+        // told what to set the compute parameters to and assume the proceeding code
+        // that
         // called us has save those values globally or per-tenant as appropriate.
         Map<String, Object> tenant = Utils.fromJson((String) event.get("body"), Map.class);
         Onboarding onboarding = dal.getOnboardingByTenantId((String) tenant.get("id"));
@@ -1164,86 +1242,135 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
             // not part of the onboarding request data nor is it part of the tenant data.
             Map<String, Object> settings = fetchSettingsForTenantUpdate(context);
             String lambdaSourceFolder = (String) settings.get("SAAS_BOOST_LAMBDAS_FOLDER");
-            String templateUrl = "https://" + settings.get("SAAS_BOOST_BUCKET") + ".s3.amazonaws.com/" + settings.get("ONBOARDING_TEMPLATE");
+            String templateUrl = "https://" + settings.get("SAAS_BOOST_BUCKET") + ".s3.cn-north-1.amazonaws.com.cn/"
+                    + settings.get("ONBOARDING_TEMPLATE");
 
             List<Parameter> templateParameters = new ArrayList<>();
             templateParameters.add(Parameter.builder().parameterKey("TenantId").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("Environment").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("SaaSBoostBucket").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("Environment").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("SaaSBoostBucket").usePreviousValue(Boolean.TRUE).build());
             if (Utils.isNotBlank(lambdaSourceFolder)) {
                 LOGGER.info("Overriding previous template parameter LambdaSourceFolder to {}", lambdaSourceFolder);
-                templateParameters.add(Parameter.builder().parameterKey("LambdaSourceFolder").parameterValue(lambdaSourceFolder).build());
+                templateParameters.add(Parameter.builder().parameterKey("LambdaSourceFolder")
+                        .parameterValue(lambdaSourceFolder).build());
             } else {
-                templateParameters.add(Parameter.builder().parameterKey("LambdaSourceFolder").usePreviousValue(Boolean.TRUE).build());
+                templateParameters.add(
+                        Parameter.builder().parameterKey("LambdaSourceFolder").usePreviousValue(Boolean.TRUE).build());
             }
-            templateParameters.add(Parameter.builder().parameterKey("DockerHostOS").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("DockerHostInstanceType").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("ContainerRepository").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("ContainerPort").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("ContainerHealthCheckPath").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("CodePipelineRoleArn").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("ArtifactBucket").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("TransitGateway").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("TenantTransitGatewayRouteTable").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("EgressTransitGatewayRouteTable").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("CidrPrefix").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("DomainName").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("SSLCertArnParam").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("HostedZoneId").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("DockerHostOS").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("DockerHostInstanceType").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("ContainerRepository").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("ContainerPort").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(Parameter.builder().parameterKey("ContainerHealthCheckPath")
+                    .usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("CodePipelineRoleArn").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("ArtifactBucket").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("TransitGateway").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(Parameter.builder().parameterKey("TenantTransitGatewayRouteTable")
+                    .usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(Parameter.builder().parameterKey("EgressTransitGatewayRouteTable")
+                    .usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("CidrPrefix").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("DomainName").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("SSLCertArnParam").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("HostedZoneId").usePreviousValue(Boolean.TRUE).build());
             templateParameters.add(Parameter.builder().parameterKey("UseEFS").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("MountPoint").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("EncryptEFS").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("EFSLifecyclePolicy").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("MountPoint").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("EncryptEFS").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("EFSLifecyclePolicy").usePreviousValue(Boolean.TRUE).build());
             templateParameters.add(Parameter.builder().parameterKey("UseRDS").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSInstanceClass").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSEngine").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSEngineVersion").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSParameterGroupFamily").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSMasterUsername").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSMasterPasswordParam").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSInstanceClass").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSEngine").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSEngineVersion").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("RDSParameterGroupFamily").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSMasterUsername").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("RDSMasterPasswordParam").usePreviousValue(Boolean.TRUE).build());
             templateParameters.add(Parameter.builder().parameterKey("RDSPort").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSDatabase").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("RDSBootstrap").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("MetricsStream").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("ALBAccessLogsBucket").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSDatabase").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("RDSBootstrap").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("MetricsStream").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("ALBAccessLogsBucket").usePreviousValue(Boolean.TRUE).build());
             templateParameters.add(Parameter.builder().parameterKey("EventBus").usePreviousValue(Boolean.TRUE).build());
             templateParameters.add(Parameter.builder().parameterKey("UseFSx").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxWindowsMountDrive").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxDailyBackupTime").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxBackupRetention").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxThroughputCapacity").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxStorageCapacity").usePreviousValue(Boolean.TRUE).build());
-            templateParameters.add(Parameter.builder().parameterKey("FSxWeeklyMaintenanceTime").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("FSxWindowsMountDrive").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("FSxDailyBackupTime").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("FSxBackupRetention").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(
+                    Parameter.builder().parameterKey("FSxThroughputCapacity").usePreviousValue(Boolean.TRUE).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("FSxStorageCapacity").usePreviousValue(Boolean.TRUE).build());
+            templateParameters.add(Parameter.builder().parameterKey("FSxWeeklyMaintenanceTime")
+                    .usePreviousValue(Boolean.TRUE).build());
 
             if (taskMemory != null) {
                 LOGGER.info("Overriding previous template parameter TaskMemory to {}", taskMemory);
-                templateParameters.add(Parameter.builder().parameterKey("TaskMemory").parameterValue(taskMemory.toString()).build());
+                templateParameters.add(
+                        Parameter.builder().parameterKey("TaskMemory").parameterValue(taskMemory.toString()).build());
             } else {
-                templateParameters.add(Parameter.builder().parameterKey("TaskMemory").usePreviousValue(Boolean.TRUE).build());
+                templateParameters
+                        .add(Parameter.builder().parameterKey("TaskMemory").usePreviousValue(Boolean.TRUE).build());
             }
             if (taskCpu != null) {
                 LOGGER.info("Overriding previous template parameter TaskCPU to {}", taskCpu);
-                templateParameters.add(Parameter.builder().parameterKey("TaskCPU").parameterValue(taskCpu.toString()).build());
+                templateParameters
+                        .add(Parameter.builder().parameterKey("TaskCPU").parameterValue(taskCpu.toString()).build());
             } else {
-                templateParameters.add(Parameter.builder().parameterKey("TaskCPU").usePreviousValue(Boolean.TRUE).build());
+                templateParameters
+                        .add(Parameter.builder().parameterKey("TaskCPU").usePreviousValue(Boolean.TRUE).build());
             }
             if (taskCount != null) {
                 LOGGER.info("Overriding previous template parameter TaskCount to {}", taskCount);
-                templateParameters.add(Parameter.builder().parameterKey("TaskCount").parameterValue(taskCount.toString()).build());
+                templateParameters.add(
+                        Parameter.builder().parameterKey("TaskCount").parameterValue(taskCount.toString()).build());
             } else {
-                templateParameters.add(Parameter.builder().parameterKey("TaskCount").usePreviousValue(Boolean.TRUE).build());
+                templateParameters
+                        .add(Parameter.builder().parameterKey("TaskCount").usePreviousValue(Boolean.TRUE).build());
             }
             if (maxCount != null) {
                 LOGGER.info("Overriding previous template parameter MaxTaskCount to {}", maxCount);
-                templateParameters.add(Parameter.builder().parameterKey("MaxTaskCount").parameterValue(maxCount.toString()).build());
+                templateParameters.add(
+                        Parameter.builder().parameterKey("MaxTaskCount").parameterValue(maxCount.toString()).build());
             } else {
-                templateParameters.add(Parameter.builder().parameterKey("MaxTaskCount").usePreviousValue(Boolean.TRUE).build());
+                templateParameters
+                        .add(Parameter.builder().parameterKey("MaxTaskCount").usePreviousValue(Boolean.TRUE).build());
             }
             if (billingPlan != null) {
-                LOGGER.info("Overriding previous template parameter BillingPlan to {}", Utils.isBlank(billingPlan) ? "''" : billingPlan);
-                templateParameters.add(Parameter.builder().parameterKey("BillingPlan").parameterValue(billingPlan).build());
+                LOGGER.info("Overriding previous template parameter BillingPlan to {}",
+                        Utils.isBlank(billingPlan) ? "''" : billingPlan);
+                templateParameters
+                        .add(Parameter.builder().parameterKey("BillingPlan").parameterValue(billingPlan).build());
             } else {
-                templateParameters.add(Parameter.builder().parameterKey("BillingPlan").usePreviousValue(Boolean.TRUE).build());
+                templateParameters
+                        .add(Parameter.builder().parameterKey("BillingPlan").usePreviousValue(Boolean.TRUE).build());
             }
             // Pass in the subdomain each time because a blank value
             // means delete the Route53 record set
@@ -1251,7 +1378,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 subdomain = "";
             }
             LOGGER.info("Setting template parameter TenantSubDomain to {}", subdomain);
-            templateParameters.add(Parameter.builder().parameterKey("TenantSubDomain").parameterValue(subdomain).build());
+            templateParameters
+                    .add(Parameter.builder().parameterKey("TenantSubDomain").parameterValue(subdomain).build());
             try {
                 UpdateStackResponse cfnResponse = cfn.updateStack(UpdateStackRequest.builder()
                         .stackName(stackId)
@@ -1259,13 +1387,13 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                         .templateURL(templateUrl)
                         .capabilitiesWithStrings("CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND")
                         .parameters(templateParameters)
-                        .build()
-                );
+                        .build());
                 stackId = cfnResponse.stackId();
                 dal.updateStatus(onboarding.getId(), OnboardingStatus.updating);
                 LOGGER.info("OnboardingService::updateProvisionedTenant stack id " + stackId);
             } catch (SdkServiceException cfnError) {
-                // CloudFormation throws a 400 error if it doesn't detect any resources in a stack
+                // CloudFormation throws a 400 error if it doesn't detect any resources in a
+                // stack
                 // need to be updated. Swallow this error.
                 if (cfnError.getMessage().contains("No updates are to be performed")) {
                     LOGGER.warn("cloudformation::updateStack error {}", cfnError.getMessage());
@@ -1307,16 +1435,18 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 .resource("settings?setting=SAAS_BOOST_STACK&setting=DOMAIN_NAME")
                 .method("GET")
                 .build();
-        SdkHttpFullRequest getSettingsApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE, getSettingsRequest);
+        SdkHttpFullRequest getSettingsApiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE,
+                getSettingsRequest);
         LOGGER.info("Fetching SaaS Boost stack and domain name from Settings Service");
         try {
-            String getSettingsResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(getSettingsApiRequest, API_TRUST_ROLE, context.getAwsRequestId());
-            ArrayList<Map<String, String>> getSettingsResponse = Utils.fromJson(getSettingsResponseBody, ArrayList.class);
+            String getSettingsResponseBody = ApiGatewayHelper.signAndExecuteApiRequest(getSettingsApiRequest,
+                    API_TRUST_ROLE, context.getAwsRequestId());
+            ArrayList<Map<String, String>> getSettingsResponse = Utils.fromJson(getSettingsResponseBody,
+                    ArrayList.class);
             settings = getSettingsResponse
                     .stream()
                     .collect(Collectors.toMap(
-                            setting -> setting.get("name"), setting -> setting.get("value")
-                    ));
+                            setting -> setting.get("name"), setting -> setting.get("value")));
         } catch (Exception e) {
             LOGGER.error("Error invoking API settings");
             LOGGER.error(Utils.getFullStackTrace(e));
@@ -1331,22 +1461,24 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                     .usePreviousTemplate(Boolean.TRUE)
                     .capabilitiesWithStrings("CAPABILITY_NAMED_IAM", "CAPABILITY_AUTO_EXPAND")
                     .parameters(
-                            Parameter.builder().parameterKey("DomainName").parameterValue(settings.get("DOMAIN_NAME")).build(),
+                            Parameter.builder().parameterKey("DomainName").parameterValue(settings.get("DOMAIN_NAME"))
+                                    .build(),
                             Parameter.builder().parameterKey("SaaSBoostBucket").usePreviousValue(Boolean.TRUE).build(),
-                            Parameter.builder().parameterKey("LambdaSourceFolder").usePreviousValue(Boolean.TRUE).build(),
+                            Parameter.builder().parameterKey("LambdaSourceFolder").usePreviousValue(Boolean.TRUE)
+                                    .build(),
                             Parameter.builder().parameterKey("Environment").usePreviousValue(Boolean.TRUE).build(),
-                            Parameter.builder().parameterKey("AdminEmailAddress").usePreviousValue(Boolean.TRUE).build(),
+                            Parameter.builder().parameterKey("AdminEmailAddress").usePreviousValue(Boolean.TRUE)
+                                    .build(),
                             Parameter.builder().parameterKey("PublicApiStage").usePreviousValue(Boolean.TRUE).build(),
                             Parameter.builder().parameterKey("PrivateApiStage").usePreviousValue(Boolean.TRUE).build(),
                             Parameter.builder().parameterKey("Version").usePreviousValue(Boolean.TRUE).build(),
-                            Parameter.builder().parameterKey("ADPasswordParam").usePreviousValue(Boolean.TRUE).build()
-                    )
-                    .build()
-            );
+                            Parameter.builder().parameterKey("ADPasswordParam").usePreviousValue(Boolean.TRUE).build())
+                    .build());
             stackId = cfnResponse.stackId();
             LOGGER.info("OnboardingService::resetDomainName stack id " + stackId);
         } catch (SdkServiceException cfnError) {
-            // CloudFormation throws a 400 error if it doesn't detect any resources in a stack
+            // CloudFormation throws a 400 error if it doesn't detect any resources in a
+            // stack
             // need to be updated. Swallow this error.
             if (cfnError.getMessage().contains("No updates are to be performed")) {
                 LOGGER.warn("cloudformation::updateStack error {}", cfnError.getMessage());
@@ -1375,21 +1507,20 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                             API_GATEWAY_HOST,
                             API_GATEWAY_STAGE,
                             ApiRequest.builder()
-                                    .resource("settings?setting=SAAS_BOOST_BUCKET&setting=SAAS_BOOST_LAMBDAS_FOLDER&setting=ONBOARDING_TEMPLATE")
+                                    .resource(
+                                            "settings?setting=SAAS_BOOST_BUCKET&setting=SAAS_BOOST_LAMBDAS_FOLDER&setting=ONBOARDING_TEMPLATE")
                                     .method("GET")
-                                    .build()
-                    ),
+                                    .build()),
                     API_TRUST_ROLE,
-                    context.getAwsRequestId()
-            );
+                    context.getAwsRequestId());
             List<Map<String, Object>> settingsResponse = Utils.fromJson(getSettingResponseBody, ArrayList.class);
             settings = settingsResponse
                     .stream()
                     .collect(Collectors.toMap(
-                            setting -> (String) setting.get("name"), setting -> setting.get("value")
-                    ));
+                            setting -> (String) setting.get("name"), setting -> setting.get("value")));
         } catch (Exception e) {
-            LOGGER.error("Error invoking API " + API_GATEWAY_STAGE + "/settings?setting=SAAS_BOOST_BUCKET&setting=SAAS_BOOST_LAMBDAS_FOLDER&setting=ONBOARDING_TEMPLATE");
+            LOGGER.error("Error invoking API " + API_GATEWAY_STAGE
+                    + "/settings?setting=SAAS_BOOST_BUCKET&setting=SAAS_BOOST_LAMBDAS_FOLDER&setting=ONBOARDING_TEMPLATE");
             LOGGER.error(Utils.getFullStackTrace(e));
             throw new RuntimeException(e);
         }
@@ -1397,7 +1528,8 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
     }
 
     /*
-    Check deployed services against service quotas to make sure limits will not be exceeded.
+     * Check deployed services against service quotas to make sure limits will not
+     * be exceeded.
      */
     private Map<String, Object> checkLimits() throws Exception {
         if (Utils.isBlank(API_GATEWAY_HOST)) {
@@ -1415,12 +1547,14 @@ public class OnboardingService implements RequestHandler<Map<String, Object>, AP
                 .resource("quotas/check")
                 .method("GET")
                 .build();
-        SdkHttpFullRequest apiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE, tenantsRequest);
+        SdkHttpFullRequest apiRequest = ApiGatewayHelper.getApiRequest(API_GATEWAY_HOST, API_GATEWAY_STAGE,
+                tenantsRequest);
         String responseBody = null;
         try {
             LOGGER.info("API call for quotas/check");
-            responseBody = ApiGatewayHelper.signAndExecuteApiRequest(apiRequest, API_TRUST_ROLE, "MetricsService-GetTenants");
-//            LOGGER.info("API response for quoatas/check: " + responseBody);
+            responseBody = ApiGatewayHelper.signAndExecuteApiRequest(apiRequest, API_TRUST_ROLE,
+                    "MetricsService-GetTenants");
+            // LOGGER.info("API response for quoatas/check: " + responseBody);
             valMap = Utils.fromJson(responseBody, HashMap.class);
         } catch (Exception e) {
             LOGGER.error("Error invoking API quotas/check");

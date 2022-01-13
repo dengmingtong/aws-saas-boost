@@ -92,7 +92,7 @@ Resources:
             Action:
               - sts:AssumeRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+        - arn:aws-cn:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
   ApiGatewayLoggingAccount:
     Type: AWS::ApiGateway::Account
     Properties:
@@ -119,7 +119,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${QuotasServiceCheck}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${QuotasServiceCheck}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -132,7 +132,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref QuotasServiceCheck
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/quotas/check
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/quotas/check
   QuotaServiceCheckResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -197,7 +197,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TenantServiceGetAll}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TenantServiceGetAll}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -210,7 +210,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref TenantServiceGetAll
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/tenants
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/tenants
   TenantServiceInsertMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -221,7 +221,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TenantServiceInsert}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TenantServiceInsert}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -234,7 +234,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref TenantServiceInsert
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/POST/tenants
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/POST/tenants
   TenantServiceResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -275,7 +275,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TenantServiceGetProvisioned}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TenantServiceGetProvisioned}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -288,7 +288,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref TenantServiceGetProvisioned
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/tenants/provisioned
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/tenants/provisioned
   TenantServiceProvisionedResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -330,7 +330,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TenantServiceUpdateOnboarding}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TenantServiceUpdateOnboarding}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
         RequestParameters: {integration.request.path.id: 'method.request.path.id'}
       MethodResponses:
@@ -344,7 +344,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref TenantServiceUpdateOnboarding
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/tenants/{id}/onboarding
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/tenants/{id}/onboarding
   TenantServiceTenantOnboardingResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -415,7 +415,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnboardingStatusListener}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnboardingStatusListener}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -428,7 +428,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref OnboardingStatusListener
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/onboarding/status
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/onboarding/status
   OnboardingServiceStatusResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -469,7 +469,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnboardingUpdateDomain}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnboardingUpdateDomain}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -482,7 +482,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref OnboardingUpdateDomain
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/onboarding/update/domain
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/onboarding/update/domain
   OnboardingServiceUpdateDomainResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -523,7 +523,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnboardingUpdateTenant}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnboardingUpdateTenant}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -536,7 +536,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref OnboardingUpdateTenant
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/onboarding/update/tenant
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/onboarding/update/tenant
   OnboardingServiceUpdateTenantResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -625,7 +625,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceGetAll}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceGetAll}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -638,7 +638,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref SettingsServiceGetAll
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings
   SettingsServiceResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -680,7 +680,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceGetSecret}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceGetSecret}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
         RequestParameters: {integration.request.path.id: 'method.request.path.id'}
       MethodResponses:
@@ -694,7 +694,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref SettingsServiceGetSecret
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings/{id}/secret
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings/{id}/secret
   SettingsServiceSecretResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -736,7 +736,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceParamStoreRef}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceParamStoreRef}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
         RequestParameters: {integration.request.path.id: 'method.request.path.id'}
       MethodResponses:
@@ -750,7 +750,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref SettingsServiceParamStoreRef
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings/{id}/ref
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings/{id}/ref
   SettingsServiceParamStoreRefResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -792,7 +792,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceTenantGetAll}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceTenantGetAll}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
         RequestParameters: {integration.request.path.id: 'method.request.path.id'}
       MethodResponses:
@@ -806,7 +806,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref SettingsServiceTenantGetAll
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings/tenant/{id}
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings/tenant/{id}
   SettingsServiceDeleteTenantSettngsMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -818,7 +818,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceTenantDelete}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceTenantDelete}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
         RequestParameters: {integration.request.path.id: 'method.request.path.id'}
       MethodResponses:
@@ -832,7 +832,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref SettingsServiceTenantDelete
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/DELETE/settings/tenant/{id}
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/DELETE/settings/tenant/{id}
   SettingsServiceByTenantIdResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -876,7 +876,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceTenantById}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceTenantById}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
         RequestParameters:
           integration.request.path.id: 'method.request.path.id'
@@ -892,7 +892,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref SettingsServiceTenantById
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings/tenant/{id}/{setting}
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/GET/settings/tenant/{id}/{setting}
   SettingsServiceUpdateTenantSettingMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -906,7 +906,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceTenantUpdate}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceTenantUpdate}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
         RequestParameters:
           integration.request.path.id: 'method.request.path.id'
@@ -922,7 +922,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref SettingsServiceTenantUpdate
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/settings/tenant/{id}/{setting}
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/PUT/settings/tenant/{id}/{setting}
   SettingsServiceTenantSettingResourceCORS:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -963,7 +963,7 @@ Resources:
       Integration:
         Type: AWS_PROXY
         IntegrationHttpMethod: POST
-        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceDeleteAppConfig}/invocations
+        Uri: !Sub arn:aws-cn:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SettingsServiceDeleteAppConfig}/invocations
         PassthroughBehavior: WHEN_NO_MATCH
       MethodResponses:
         - StatusCode: '200'
@@ -976,7 +976,7 @@ Resources:
       Principal: apigateway.amazonaws.com
       Action: lambda:InvokeFunction
       FunctionName: !Ref SettingsServiceDeleteAppConfig
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/DELETE/settings/config
+      SourceArn: !Sub arn:aws-cn:execute-api:${AWS::Region}:${AWS::AccountId}:${PrivateApi}/*/DELETE/settings/config
   ApiDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
